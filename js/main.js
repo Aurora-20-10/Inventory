@@ -15,8 +15,8 @@ function renderTable(items) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>
-        <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
-        <input type="text" value="${item.image}" onchange="updateData(${index}, 'image', this.value)">
+      <td contenteditable="true" onpaste="handleImagePaste(event, ${index})" style="padding:0;">
+  <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
@@ -119,4 +119,15 @@ function deleteByRowIndex() {
     renderTable(data);
     input.value = ''; // reset sau khi xoá
   }
+}
+
+function handleImagePaste(e, index) {
+  e.preventDefault(); // Chặn dán mặc định
+
+  const link = (e.clipboardData || window.clipboardData).getData('text');
+  if (!link.startsWith('http')) return;
+
+  data[index].image = link;
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  renderTable(data);
 }
