@@ -14,8 +14,9 @@ function renderTable(items) {
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)" style="padding:0;">
+      <td>
         <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
+        <input type="text" value="${item.image}" onchange="updateData(${index}, 'image', this.value)">
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
@@ -26,6 +27,7 @@ function renderTable(items) {
     tableBody.appendChild(row);
   });
 }
+
 
 
 
