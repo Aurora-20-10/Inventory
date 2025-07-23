@@ -14,11 +14,12 @@ const categoryFilter = document.getElementById('categoryFilter');
 const searchInput    = document.getElementById('searchInput');
 const addForm        = document.getElementById('addForm');
 
-function renderTable(items) {
+function renderTable(items = data) {
   tableBody.innerHTML = '';
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
+      <td><input type="checkbox" class="rowCheckbox" data-index="${index}"></td>
       <td onpaste="handleImagePaste(event, ${index})" style="padding:0; cursor:pointer;">
         <img src="${item.image || 'https://via.placeholder.com/80'}" alt="img" style="display:block; max-height:60px;">
       </td>
@@ -30,9 +31,14 @@ function renderTable(items) {
     `;
     tableBody.appendChild(row);
   });
+
+  document.getElementById("selectAll")?.addEventListener("change", function () {
+    const checked = this.checked;
+    document.querySelectorAll(".rowCheckbox").forEach(cb => cb.checked = checked);
+  });
 }
 
-function escapeHTML(str='') {
+function escapeHTML(str = '') {
   return String(str)
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
@@ -68,7 +74,7 @@ categoryFilter.addEventListener('change', updateFilter);
 searchInput.addEventListener('input', updateFilter);
 
 initFilters();
-renderTable(data);
+renderTable();
 
 addForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -87,7 +93,7 @@ addForm.addEventListener('submit', function (e) {
 
   addForm.reset();
   initFilters();
-  renderTable(data);
+  renderTable();
 });
 
 function exportData() {
@@ -125,7 +131,7 @@ function deleteByRowIndex() {
     localStorage.setItem('inventoryData', JSON.stringify(data));
     input.value = '';
     initFilters();
-    renderTable(data);
+    renderTable();
   }
 }
 window.deleteByRowIndex = deleteByRowIndex;
@@ -137,11 +143,10 @@ function handleImagePaste(e, index) {
 
   data[index].image = link;
   localStorage.setItem('inventoryData', JSON.stringify(data));
-  renderTable(data);
+  renderTable();
 }
 window.handleImagePaste = handleImagePaste;
 
-/* --- NHẬP JSON BỔ SUNG + CHỐNG TRÙNG --- */
 function importData() {
   const fileInput = document.getElementById('importJsonInput');
   const file = fileInput.files[0];
@@ -169,7 +174,7 @@ function importData() {
 
       localStorage.setItem('inventoryData', JSON.stringify(data));
       initFilters();
-      renderTable(data);
+      renderTable();
       alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
 
     } catch (err) {
@@ -179,3 +184,26 @@ function importData() {
   reader.readAsText(file);
 }
 window.importData = importData;
+
+/* === XOÁ CÁC DÒNG ĐÃ CHỌN BẰNG CHECKBOX === */
+function deleteSelectedRows() {
+  const checkboxes = document.querySelectorAll(".rowCheckbox:checked");
+  if (checkboxes.length === 0) {
+    alert("Vui lòng chọn ít nhất một dòng để xoá.");
+    return;
+  }
+
+  if (!confirm(`Xoá ${checkboxes.length} dòng đã chọn?`)) return;
+
+  const indexesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute("data-index")));
+
+  // Xoá từ cuối lên
+  for (let i = indexesToDelete.length - 1; i >= 0; i--) {
+    data.splice(indexesToDelete[i], 1);
+  }
+
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  initFilters();
+  renderTable();
+}
+window.deleteSelectedRows = deleteSelectedRows;
