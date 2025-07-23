@@ -3,10 +3,7 @@
  * Bản gọn ổn định: paste link ảnh -> chỉ hiện ảnh, không hiện chữ.
  */
 
-/* Lấy dữ liệu đầu vào ban đầu:
-   - Nếu file items.js load trước và có window.data -> dùng làm dữ liệu gốc.
-   - Nếu localStorage đã có -> override.
-*/
+/* --- LOAD DỮ LIỆU --- */
 let data = Array.isArray(window.data) ? [...window.data] : [];
 
 const savedData = localStorage.getItem('inventoryData');
@@ -17,13 +14,13 @@ if (savedData) {
   } catch (_) {}
 }
 
-/* DOM refs */
+/* --- DOM references --- */
 const tableBody      = document.querySelector('#itemTable tbody');
 const categoryFilter = document.getElementById('categoryFilter');
 const searchInput    = document.getElementById('searchInput');
 const addForm        = document.getElementById('addForm');
 
-/* --- RENDER TABLE --- */
+/* --- RENDER BẢNG --- */
 function renderTable(items) {
   tableBody.innerHTML = '';
   items.forEach((item, index) => {
@@ -42,31 +39,33 @@ function renderTable(items) {
   });
 }
 
-/* Escape nhỏ để tránh HTML bậy bạ khi sửa trực tiếp */
-function escapeHTML(str='') {
+/* --- ESCAPE HTML --- */
+function escapeHTML(str = '') {
   return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;');
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
 }
 
-/* --- FILTERS --- */
+/* --- FILTER --- */
 function updateFilter() {
   const category = categoryFilter.value;
-  const keyword  = searchInput.value.trim().toLowerCase();
+  const keyword = searchInput.value.trim().toLowerCase();
+
   const filtered = data.filter(item => {
     const matchCategory = !category || item.category === category;
-    const matchKeyword  = !keyword ||
-      (item.name   && item.name.toLowerCase().includes(keyword)) ||
-      (item.note   && item.note.toLowerCase().includes(keyword)) ||
+    const matchKeyword =
+      !keyword ||
+      (item.name && item.name.toLowerCase().includes(keyword)) ||
+      (item.note && item.note.toLowerCase().includes(keyword)) ||
       (item.status && item.status.toLowerCase().includes(keyword));
     return matchCategory && matchKeyword;
   });
+
   renderTable(filtered);
 }
 
 function initFilters() {
-  // reset options
   categoryFilter.innerHTML = '<option value="">Tất cả</option>';
   const categories = [...new Set(data.map(item => item.category).filter(Boolean))];
   categories.forEach(cat => {
@@ -77,15 +76,14 @@ function initFilters() {
   });
 }
 
-/* Events filter */
 categoryFilter.addEventListener('change', updateFilter);
 searchInput.addEventListener('input', updateFilter);
 
-/* First render */
+/* --- KHỞI TẠO --- */
 initFilters();
 renderTable(data);
 
-/* --- ADD NEW ITEM --- */
+/* --- THÊM MỚI --- */
 addForm.addEventListener('submit', function (e) {
   e.preventDefault();
 
@@ -106,62 +104,31 @@ addForm.addEventListener('submit', function (e) {
   renderTable(data);
 });
 
-/* --- EXPORT JSON --- */
+/* --- CẬP NHẬT INLINE --- */
+function updateData(index, key, value) {
+  data[index][key] = value.trim();
+
+  if (key === 'image') {
+    const row = tableBody.children[index];
+    const img = row?.querySelector('img');
+    if (img) img.src = value.trim() || 'https://via.placeholder.com/80';
+  }
+
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+}
+window.updateData = updateData;
+
+/* --- XUẤT JSON --- */
 function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = url;
   a.download = 'inventory_backup.json';
   a.click();
   URL.revokeObjectURL(url);
 }
-window.exportData = exportData; // để button gọi được
-
-/* --- UPDATE DATA INLINE --- */
-function updateData(index, key, value) {
-  data[index][key] = value.trim();
-  if (key === 'image') {
-    // cập nhật hình tại chỗ
-    const row = tableBody.children[index];
-    const img = row?.querySelector('img');
-    if (img) img.src = value.trim() || 'https://via.placeholder.com/80';
-  }
-  localStorage.setItem('inventoryData', JSON.stringify(data));
-}
-window.updateData = updateData; // cần expose vì inline handler
-
-/* --- DELETE BY ROW INDEX --- */
-function deleteByRowIndex() {
-  const input = document.getElementById('rowIndexInput');
-  const index = parseInt(input.value, 10) - 1; // người dùng nhập từ 1
-
-  if (isNaN(index) || index < 0 || index >= data.length) {
-    alert('Số dòng không hợp lệ!');
-    return;
-  }
-
-  if (confirm(`Xoá dòng số ${index + 1}?`)) {
-    data.splice(index, 1);
-    localStorage.setItem('inventoryData', JSON.stringify(data));
-    input.value = '';
-    initFilters();
-    renderTable(data);
-  }
-}
-window.deleteByRowIndex = deleteByRowIndex;
-
-/* --- HANDLE PASTE LINK ẢNH TRỰC TIẾP TRONG Ô ẢNH --- */
-function handleImagePaste(e, index) {
-  e.preventDefault();
-  const link = (e.clipboardData || window.clipboardData).getData('text').trim();
-  if (!link || !link.startsWith('http')) return;
-
-  data[index].image = link;
-  localStorage.setItem('inventoryData', JSON.stringify(data));
-  renderTable(data);
-}
-window.handleImagePaste = handleImagePaste;
+window.exportData = exportData;
 
 /* --- NHẬP JSON --- */
 function importData() {
@@ -189,3 +156,35 @@ function importData() {
   reader.readAsText(file);
 }
 window.importData = importData;
+
+/* --- XOÁ THEO CHỈ MỤC --- */
+function deleteByRowIndex() {
+  const input = document.getElementById('rowIndexInput');
+  const index = parseInt(input.value, 10) - 1;
+
+  if (isNaN(index) || index < 0 || index >= data.length) {
+    alert('Số dòng không hợp lệ!');
+    return;
+  }
+
+  if (confirm(`Xoá dòng số ${index + 1}?`)) {
+    data.splice(index, 1);
+    localStorage.setItem('inventoryData', JSON.stringify(data));
+    input.value = '';
+    initFilters();
+    renderTable(data);
+  }
+}
+window.deleteByRowIndex = deleteByRowIndex;
+
+/* --- PASTE LINK ẢNH --- */
+function handleImagePaste(e, index) {
+  e.preventDefault();
+  const link = (e.clipboardData || window.clipboardData).getData('text').trim();
+  if (!link || !link.startsWith('http')) return;
+
+  data[index].image = link;
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  renderTable(data);
+}
+window.handleImagePaste = handleImagePaste;
