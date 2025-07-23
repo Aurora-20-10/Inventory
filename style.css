@@ -1,0 +1,35 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+th {
+  background-color: #f0f0f0;
+}
+img {
+  width: 80px;
+  height: auto;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+img:hover {
+  transform: scale(2);
+  z-index: 10;
+  position: relative;
+}
+select, input {
+  padding: 5px;
+  margin: 5px;
+}
+.filter-bar {
+  margin-bottom: 15px;
+}
