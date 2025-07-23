@@ -45,3 +45,25 @@ searchInput.addEventListener('input', updateFilter);
 
 initFilters();
 renderTable(data);
+
+const addForm = document.getElementById('addForm');
+
+addForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const newItem = {
+    name: document.getElementById('newName').value,
+    category: document.getElementById('newCategory').value,
+    date: document.getElementById('newDate').value,
+    status: document.getElementById('newStatus').value,
+    note: document.getElementById('newNote').value,
+    image: document.getElementById('newImage').value || 'https://via.placeholder.com/80',
+    qr: document.getElementById('newQR').value || '#'
+  };
+
+  data.push(newItem);
+  renderTable(data);
+  initFilters(); // để cập nhật thêm category mới vào select
+
+  addForm.reset(); // reset form
+});
