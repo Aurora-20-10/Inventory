@@ -75,6 +75,11 @@ addForm.addEventListener('submit', function (e) {
   localStorage.setItem('inventoryData', JSON.stringify(data));
   renderTable(data);
   
+  initFilters(); // để cập nhật thêm category mới vào select
+
+  addForm.reset(); // reset form
+});
+
 // 1. Xuất dữ liệu ra JSON
 function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -86,29 +91,6 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-// 2. Xoá toàn bộ dữ liệu
-function clearData() {
-  if (confirm('Bạn chắc chắn muốn xoá toàn bộ dữ liệu?')) {
-    localStorage.removeItem('inventoryData');
-    data = [];
-    renderTable(data);
-    initFilters(); // làm mới dropdown
-  }
-}
-
-// 3. Reset về dữ liệu mặc định từ items.js
-function resetToDefault() {
-  if (confirm('Khôi phục dữ liệu mặc định? (Toàn bộ dữ liệu hiện tại sẽ bị mất)')) {
-    localStorage.removeItem('inventoryData');
-    location.reload(); // sẽ nạp lại từ file items.js ban đầu
-  }
-}
-
-  
-  initFilters(); // để cập nhật thêm category mới vào select
-
-  addForm.reset(); // reset form
-});
 
 function updateData(index, key, value) {
   data[index][key] = value;
