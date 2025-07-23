@@ -4,20 +4,23 @@ const searchInput = document.getElementById('searchInput');
 
 function renderTable(items) {
   tableBody.innerHTML = '';
-  items.forEach(item => {
+  items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td><img src="${item.image}" alt="img"></td>
-      <td>${item.name}</td>
-      <td>${item.category}</td>
-      <td>${item.date}</td>
-      <td>${item.status}</td>
-      <td>${item.note}</td>
-      <td><a href="${item.qr}" target="_blank">🔗 QR</a></td>
+      <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'qr', this.innerText)">
+        <a href="${item.qr}" target="_blank">🔗 QR</a>
+      </td>
     `;
     tableBody.appendChild(row);
   });
 }
+
 
 function updateFilter() {
   const category = categoryFilter.value;
