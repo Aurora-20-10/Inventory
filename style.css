@@ -33,3 +33,15 @@ select, input {
 .filter-bar {
   margin-bottom: 15px;
 }
+form#addForm {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+form#addForm input,
+form#addForm button {
+  padding: 8px;
+  font-size: 14px;
+}
+
