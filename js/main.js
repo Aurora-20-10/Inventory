@@ -3,8 +3,6 @@ if (savedData) {
   data = JSON.parse(savedData);
 }
 
-
-
 const tableBody = document.querySelector('#itemTable tbody');
 const categoryFilter = document.getElementById('categoryFilter');
 const searchInput = document.getElementById('searchInput');
@@ -14,18 +12,17 @@ function renderTable(items) {
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td><img src="${item.image}" alt="img"></td>
-      <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'qr', this.innerText)">
-        <a href="${item.qr}" target="_blank">🔗 QR</a>
-      </td>
-    `;
-    tableBody.appendChild(row);
-  });
+  <td><img src="${item.image}" alt="img"></td>
+  <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'qr', this.innerText)">
+    <a href="${item.qr}" target="_blank">🔗 QR</a>
+  </td>
+  <td><button onclick="deleteItem(${index})">❌</button></td>
+`;
 }
 
 
@@ -95,4 +92,12 @@ function exportData() {
 function updateData(index, key, value) {
   data[index][key] = value;
   localStorage.setItem('inventoryData', JSON.stringify(data));
+}
+
+function deleteItem(index) {
+  if (confirm("Bạn có chắc muốn xoá mục này?")) {
+    data.splice(index, 1); // xoá khỏi mảng
+    localStorage.setItem("inventoryData", JSON.stringify(data)); // cập nhật localStorage
+    renderTable(data); // vẽ lại bảng
+  }
 }
