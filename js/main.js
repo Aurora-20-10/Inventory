@@ -99,6 +99,11 @@ function exportData() {
 function updateData(index, key, value) {
   data[index][key] = value;
   localStorage.setItem('inventoryData', JSON.stringify(data));
+  
+  // ✅ Nếu người dùng sửa link ảnh, thì render lại bảng để ảnh cập nhật
+  if (key === 'image') {
+    renderTable(data);
+  }
 }
 
 function deleteByRowIndex() {
