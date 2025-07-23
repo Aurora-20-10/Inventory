@@ -1,4 +1,4 @@
-const data = [
+let data = [
   {
     name: "Bàn phím Fun60",
     category: "Thiết bị",
