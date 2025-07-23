@@ -21,7 +21,6 @@ function renderTable(items) {
   <td contenteditable="true" oninput="updateData(${index}, 'qr', this.innerText)">
     <a href="${item.qr}" target="_blank">🔗 QR</a>
   </td>
-  <td><button onclick="deleteItem(${index})">❌</button></td>
 `;
 }
 
@@ -92,12 +91,4 @@ function exportData() {
 function updateData(index, key, value) {
   data[index][key] = value;
   localStorage.setItem('inventoryData', JSON.stringify(data));
-}
-
-function deleteItem(index) {
-  if (confirm("Bạn có chắc muốn xoá mục này?")) {
-    data.splice(index, 1); // xoá khỏi mảng
-    localStorage.setItem("inventoryData", JSON.stringify(data)); // cập nhật localStorage
-    renderTable(data); // vẽ lại bảng
-  }
 }
