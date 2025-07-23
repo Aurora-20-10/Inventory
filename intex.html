@@ -2,94 +2,116 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản Lý Tài Sản Cá Nhân</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: auto; background: #f8f9fa; }
-    h1 { color: #333; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px; background: #fff; }
-    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
-    th { background-color: #e9ecef; }
-    img.thumb { height: 60px; }
-    .filter-bar { margin-top: 20px; margin-bottom: 10px; }
-    input, select { padding: 6px; margin-right: 10px; }
-    .qr-img { height: 60px; }
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    img { width: 80px; height: auto; cursor: pointer; transition: transform 0.2s ease; }
+    img:hover { transform: scale(2); z-index: 10; position: relative; }
+    select, input { padding: 5px; margin: 5px; }
+    .filter-bar { margin-bottom: 15px; }
   </style>
 </head>
 <body>
-  <h1>Quản Lý Tài Sản Cá Nhân</h1>
+  <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
 
   <div class="filter-bar">
-    <label>Nhóm:
-      <select id="groupFilter">
-        <option value="">Tất cả</option>
-      </select>
-    </label>
-    <label>Tìm kiếm:
-      <input type="text" id="searchInput" placeholder="Từ khoá...">
-    </label>
+    <label for="categoryFilter">Phân loại:</label>
+    <select id="categoryFilter">
+      <option value="">Tất cả</option>
+    </select>
+
+    <label for="searchInput">Tìm kiếm:</label>
+    <input type="text" id="searchInput" placeholder="Nhập từ khóa...">
   </div>
 
-  <table id="inventoryTable">
+  <table id="itemTable">
     <thead>
       <tr>
         <th>Ảnh</th>
         <th>Tên</th>
-        <th>Nhóm</th>
-        <th>Ngày Mua</th>
-        <th>Tình Trạng</th>
-        <th>Ghi Chú</th>
+        <th>Phân loại</th>
+        <th>Ngày mua</th>
+        <th>Trạng thái</th>
+        <th>Ghi chú</th>
         <th>QR</th>
       </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
   </table>
 
   <script>
-    let data = [];
+    const data = [
+      {
+        name: "Bàn phím Fun60",
+        category: "Thiết bị",
+        date: "2024-06-15",
+        status: "Đang dùng",
+        note: "Có LED đỏ",
+        image: "https://i.imgur.com/Example1.jpg",
+        qr: "https://example.com/fun60"
+      },
+      {
+        name: "Tai nghe X11",
+        category: "Thiết bị",
+        date: "2024-05-22",
+        status: "Hỏng",
+        note: "Đứt dây trái",
+        image: "https://i.imgur.com/Example2.jpg",
+        qr: "https://example.com/x11"
+      }
+    ];
 
-    const tbody = document.querySelector("#inventoryTable tbody");
-    const groupFilter = document.getElementById("groupFilter");
-    const searchInput = document.getElementById("searchInput");
+    const tableBody = document.querySelector('#itemTable tbody');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const searchInput = document.getElementById('searchInput');
 
-    function renderTable() {
-      const keyword = searchInput.value.toLowerCase();
-      const group = groupFilter.value;
-      tbody.innerHTML = "";
-      const groups = new Set();
-
-      data.forEach(item => {
-        groups.add(item.group);
-      });
-
-      groupFilter.innerHTML = '<option value="">Tất cả</option>' + [...groups].map(g => `<option value="${g}">${g}</option>`).join("");
-
-      data.filter(item => {
-        return (!group || item.group === group) &&
-               (item.name.toLowerCase().includes(keyword) || item.note.toLowerCase().includes(keyword));
-      }).forEach(item => {
-        const row = `<tr>
-          <td><img class="thumb" src="${item.image}" alt=""></td>
+    function renderTable(items) {
+      tableBody.innerHTML = '';
+      items.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><img src="${item.image}" alt="img"></td>
           <td>${item.name}</td>
-          <td>${item.group}</td>
+          <td>${item.category}</td>
           <td>${item.date}</td>
           <td>${item.status}</td>
           <td>${item.note}</td>
-          <td><img class="qr-img" src="${item.qr}" alt="QR"></td>
-        </tr>`;
-        tbody.innerHTML += row;
+          <td><a href="${item.qr}" target="_blank">🔗 QR</a></td>
+        `;
+        tableBody.appendChild(row);
       });
     }
 
-    fetch("data.json")
-      .then(res => res.json())
-      .then(json => {
-        data = json;
-        renderTable();
+    function updateFilter() {
+      const category = categoryFilter.value;
+      const keyword = searchInput.value.toLowerCase();
+      const filtered = data.filter(item => {
+        const matchCategory = !category || item.category === category;
+        const matchKeyword = item.name.toLowerCase().includes(keyword) || item.note.toLowerCase().includes(keyword);
+        return matchCategory && matchKeyword;
       });
+      renderTable(filtered);
+    }
 
-    groupFilter.addEventListener("change", renderTable);
-    searchInput.addEventListener("input", renderTable);
+    function initFilters() {
+      const categories = [...new Set(data.map(item => item.category))];
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat;
+        option.textContent = cat;
+        categoryFilter.appendChild(option);
+      });
+    }
+
+    categoryFilter.addEventListener('change', updateFilter);
+    searchInput.addEventListener('input', updateFilter);
+
+    initFilters();
+    renderTable(data);
   </script>
 </body>
 </html>
