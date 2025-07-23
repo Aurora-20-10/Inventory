@@ -13,21 +13,20 @@ function renderTable(items) {
   tableBody.innerHTML = '';
   items.forEach((item, index) => {
     const row = document.createElement('tr');
-    <td contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)">
-  <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
-  <div>${item.image}</div>
-</td>
-
-
-  <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
-`;
+    row.innerHTML = `
+      <td contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)" style="padding:0;">
+        <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
+      </td>
+      <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
+    `;
     tableBody.appendChild(row);
   });
 }
+
 
 
 function updateFilter() {
@@ -91,18 +90,16 @@ function exportData() {
   URL.revokeObjectURL(url);
 }
 
-
 function updateData(index, key, value) {
-  items[index][key] = value;
+  data[index][key] = value;
 
-  // Nếu key là 'image' thì đổi luôn ảnh đang hiển thị
   if (key === 'image') {
     const row = tableBody.children[index];
     const img = row.querySelector('img');
     if (img) img.src = value;
   }
-  
-  localStorage.setItem('items', JSON.stringify(items));
+
+  localStorage.setItem('inventoryData', JSON.stringify(data));
 }
 
 function deleteByRowIndex() {
