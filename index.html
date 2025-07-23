@@ -5,6 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quản Lý Tài Sản Cá Nhân</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    td img {
+      max-width: 80px;
+      max-height: 80px;
+      object-fit: cover;
+    }
+    td.editable:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+    }
+    td input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 <body>
   <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
@@ -56,10 +71,7 @@
     <button onclick="deleteByRowIndex()">❌ Xoá dòng</button>
   </div>
 
-  <!-- Dữ liệu mẫu (nếu cần) -->
   <script src="data/items.js"></script>
-
-  <!-- Script chính -->
   <script src="js/main.js"></script>
 </body>
 </html>
