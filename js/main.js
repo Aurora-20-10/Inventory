@@ -70,3 +70,8 @@ addForm.addEventListener('submit', function (e) {
 
   addForm.reset(); // reset form
 });
+
+function updateData(index, key, value) {
+  data[index][key] = value;
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+}
