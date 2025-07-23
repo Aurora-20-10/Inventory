@@ -1,4 +1,4 @@
-let data = []; 
+let data = [];
 
 const savedData = localStorage.getItem('inventoryData');
 if (savedData) {
@@ -14,7 +14,7 @@ function renderTable(items) {
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td onpaste="handleImagePaste(event, ${index})" style="padding:0;">
+      <td contenteditable="true" onpaste="handleImagePaste(event, ${index})" style="padding:0;">
         <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
@@ -39,8 +39,8 @@ function updateFilter() {
 }
 
 function initFilters() {
-  categoryFilter.innerHTML = '<option value="">Tất cả</option>'; // reset lại
   const categories = [...new Set(data.map(item => item.category))];
+  categoryFilter.innerHTML = '<option value="">Tất cả</option>';
   categories.forEach(cat => {
     const option = document.createElement('option');
     option.value = cat;
@@ -75,16 +75,6 @@ addForm.addEventListener('submit', function (e) {
   initFilters();
   addForm.reset();
 });
-
-function exportData() {
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'inventory_backup.json';
-  a.click();
-  URL.revokeObjectURL(url);
-}
 
 function updateData(index, key, value) {
   data[index][key] = value;
@@ -123,4 +113,14 @@ function handleImagePaste(e, index) {
   data[index].image = link;
   localStorage.setItem('inventoryData', JSON.stringify(data));
   renderTable(data);
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'inventory_backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
 }
