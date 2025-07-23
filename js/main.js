@@ -18,11 +18,6 @@ function renderTable(items) {
   <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
 </td>
 
-  <div contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)">
-    ${item.image}
-  </div>
-</td>
-
   <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
