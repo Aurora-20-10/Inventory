@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản Lý Tài Sản Cá Nhân</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 1200px; margin: auto; background: #f8f9fa; }
+    h1 { color: #333; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 15px; background: #fff; }
+    th, td { border: 1px solid #ccc; padding: 8px 12px; text-align: left; }
+    th { background-color: #e9ecef; }
+    img.thumb { height: 60px; }
+    .filter-bar { margin-top: 20px; margin-bottom: 10px; }
+    input, select { padding: 6px; margin-right: 10px; }
+    .qr-img { height: 60px; }
+  </style>
+</head>
+<body>
+  <h1>Quản Lý Tài Sản Cá Nhân</h1>
+
+  <div class="filter-bar">
+    <label>Nhóm:
+      <select id="groupFilter">
+        <option value="">Tất cả</option>
+      </select>
+    </label>
+    <label>Tìm kiếm:
+      <input type="text" id="searchInput" placeholder="Từ khoá...">
+    </label>
+  </div>
+
+  <table id="inventoryTable">
+    <thead>
+      <tr>
+        <th>Ảnh</th>
+        <th>Tên</th>
+        <th>Nhóm</th>
+        <th>Ngày Mua</th>
+        <th>Tình Trạng</th>
+        <th>Ghi Chú</th>
+        <th>QR</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    let data = [];
+
+    const tbody = document.querySelector("#inventoryTable tbody");
+    const groupFilter = document.getElementById("groupFilter");
+    const searchInput = document.getElementById("searchInput");
+
+    function renderTable() {
+      const keyword = searchInput.value.toLowerCase();
+      const group = groupFilter.value;
+      tbody.innerHTML = "";
+      const groups = new Set();
+
+      data.forEach(item => {
+        groups.add(item.group);
+      });
+
+      groupFilter.innerHTML = '<option value="">Tất cả</option>' + [...groups].map(g => `<option value="${g}">${g}</option>`).join("");
+
+      data.filter(item => {
+        return (!group || item.group === group) &&
+               (item.name.toLowerCase().includes(keyword) || item.note.toLowerCase().includes(keyword));
+      }).forEach(item => {
+        const row = `<tr>
+          <td><img class="thumb" src="${item.image}" alt=""></td>
+          <td>${item.name}</td>
+          <td>${item.group}</td>
+          <td>${item.date}</td>
+          <td>${item.status}</td>
+          <td>${item.note}</td>
+          <td><img class="qr-img" src="${item.qr}" alt="QR"></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    fetch("data.json")
+      .then(res => res.json())
+      .then(json => {
+        data = json;
+        renderTable();
+      });
+
+    groupFilter.addEventListener("change", renderTable);
+    searchInput.addEventListener("input", renderTable);
+  </script>
+</body>
+</html>
