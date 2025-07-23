@@ -9,7 +9,6 @@
 <body>
   <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
 
-  <!-- Bộ lọc -->
   <div class="filter-bar">
     <label for="categoryFilter">Phân loại:</label>
     <select id="categoryFilter">
@@ -20,7 +19,6 @@
     <input type="text" id="searchInput" placeholder="Nhập từ khóa...">
   </div>
 
-  <!-- Form thêm mới -->
   <h3>➕ Thêm Tài Sản Mới</h3>
   <form id="addForm" autocomplete="off">
     <input type="text" id="newName" placeholder="Tên" required>
@@ -32,14 +30,12 @@
     <button type="submit">Thêm</button>
   </form>
 
-  <!-- Các nút tiện ích -->
   <div style="margin-top: 20px;">
     <button onclick="exportData()">📤 Xuất JSON</button>
     <input type="file" id="importJsonInput" accept=".json">
     <button onclick="importData()">📥 Nhập JSON</button>
   </div>
 
-  <!-- Bảng dữ liệu -->
   <table id="itemTable">
     <thead>
       <tr>
@@ -54,14 +50,12 @@
     <tbody></tbody>
   </table>
 
-  <!-- Xoá dòng theo chỉ mục -->
   <div id="deleteRowControl" style="margin-top: 20px;">
     <label for="rowIndexInput">Nhập số thứ tự hàng muốn xoá:</label>
     <input type="number" id="rowIndexInput" min="1" placeholder="VD: 1">
     <button onclick="deleteByRowIndex()">❌ Xoá dòng</button>
   </div>
 
-  <!-- Load dữ liệu & script chính -->
   <script src="data/items.js"></script>
   <script src="js/main.js"></script>
 </body>
