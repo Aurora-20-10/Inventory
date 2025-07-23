@@ -68,7 +68,6 @@ addForm.addEventListener('submit', function (e) {
     status: document.getElementById('newStatus').value,
     note: document.getElementById('newNote').value,
     image: document.getElementById('newImage').value || 'https://via.placeholder.com/80',
-    qr: document.getElementById('newQR').value || '#'
   };
 
   data.push(newItem);
