@@ -30,9 +30,9 @@ function renderTable(items) {
 
   <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
+  <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
 `;
     tableBody.appendChild(row);
   });
