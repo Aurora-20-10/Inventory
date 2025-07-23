@@ -1,4 +1,3 @@
-// Quản Lý Tài Sản Cá Nhân - Aurora
 let data = Array.isArray(window.data) ? [...window.data] : [];
 
 const savedData = localStorage.getItem('inventoryData');
@@ -9,18 +8,22 @@ if (savedData) {
   } catch (_) {}
 }
 
-const tableBody      = document.querySelector('#itemTable tbody');
+const tableBody = document.querySelector('#itemTable tbody');
 const categoryFilter = document.getElementById('categoryFilter');
-const searchInput    = document.getElementById('searchInput');
-const addForm        = document.getElementById('addForm');
+const searchInput = document.getElementById('searchInput');
+const addForm = document.getElementById('addForm');
 
 function renderTable(items) {
   tableBody.innerHTML = '';
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td onpaste="handleImagePaste(event, ${index})" style="padding:0; cursor:pointer;">
-        <img src="${item.image || 'https://via.placeholder.com/80'}" alt="img" style="display:block; max-height:60px;">
+      <td>
+        <img src="${item.image || 'https://via.placeholder.com/80'}"
+             alt="img" style="max-height:60px; display:block;">
+        <div contenteditable="true" 
+             oninput="updateData(${index}, 'image', this.innerText)"
+             style="font-size:10px; max-width:100px; word-break:break-word; border:1px dashed #ccc; margin-top:5px; padding:2px;">${escapeHTML(item.image)}</div>
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
@@ -41,12 +44,12 @@ function escapeHTML(str='') {
 
 function updateFilter() {
   const category = categoryFilter.value;
-  const keyword  = searchInput.value.trim().toLowerCase();
+  const keyword = searchInput.value.trim().toLowerCase();
   const filtered = data.filter(item => {
     const matchCategory = !category || item.category === category;
-    const matchKeyword  = !keyword ||
-      (item.name   && item.name.toLowerCase().includes(keyword)) ||
-      (item.note   && item.note.toLowerCase().includes(keyword)) ||
+    const matchKeyword = !keyword ||
+      (item.name && item.name.toLowerCase().includes(keyword)) ||
+      (item.note && item.note.toLowerCase().includes(keyword)) ||
       (item.status && item.status.toLowerCase().includes(keyword));
     return matchCategory && matchKeyword;
   });
@@ -72,19 +75,17 @@ renderTable(data);
 
 addForm.addEventListener('submit', function (e) {
   e.preventDefault();
-
   const newItem = {
-    name:     document.getElementById('newName').value.trim(),
+    name: document.getElementById('newName').value.trim(),
     category: document.getElementById('newCategory').value.trim(),
-    date:     document.getElementById('newDate').value,
-    status:   document.getElementById('newStatus').value.trim(),
-    note:     document.getElementById('newNote').value.trim(),
-    image:    document.getElementById('newImage').value.trim() || 'https://via.placeholder.com/80'
+    date: document.getElementById('newDate').value,
+    status: document.getElementById('newStatus').value.trim(),
+    note: document.getElementById('newNote').value.trim(),
+    image: document.getElementById('newImage').value.trim() || 'https://via.placeholder.com/80'
   };
 
   data.push(newItem);
   localStorage.setItem('inventoryData', JSON.stringify(data));
-
   addForm.reset();
   initFilters();
   renderTable(data);
@@ -92,8 +93,8 @@ addForm.addEventListener('submit', function (e) {
 
 function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = url;
   a.download = 'inventory_backup.json';
   a.click();
@@ -103,12 +104,8 @@ window.exportData = exportData;
 
 function updateData(index, key, value) {
   data[index][key] = value.trim();
-  if (key === 'image') {
-    const row = tableBody.children[index];
-    const img = row?.querySelector('img');
-    if (img) img.src = value.trim() || 'https://via.placeholder.com/80';
-  }
   localStorage.setItem('inventoryData', JSON.stringify(data));
+  if (key === 'image') renderTable(data); // cập nhật ảnh ngay lập tức
 }
 window.updateData = updateData;
 
@@ -130,18 +127,6 @@ function deleteByRowIndex() {
 }
 window.deleteByRowIndex = deleteByRowIndex;
 
-function handleImagePaste(e, index) {
-  e.preventDefault();
-  const link = (e.clipboardData || window.clipboardData).getData('text').trim();
-  if (!link || !link.startsWith('http')) return;
-
-  data[index].image = link;
-  localStorage.setItem('inventoryData', JSON.stringify(data));
-  renderTable(data);
-}
-window.handleImagePaste = handleImagePaste;
-
-/* --- NHẬP JSON BỔ SUNG + CHỐNG TRÙNG --- */
 function importData() {
   const fileInput = document.getElementById('importJsonInput');
   const file = fileInput.files[0];
@@ -171,7 +156,6 @@ function importData() {
       initFilters();
       renderTable(data);
       alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
-
     } catch (err) {
       alert("File JSON không hợp lệ!");
     }
