@@ -14,9 +14,11 @@ function renderTable(items) {
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-  <td contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)">
+  <td>
   <img src="${item.image}" alt="img"><br>
-  ${item.image}
+  <div contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)">
+    ${item.image}
+  </div>
 </td>
 
   <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
