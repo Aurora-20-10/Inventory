@@ -13,10 +13,11 @@ function renderTable(items) {
   tableBody.innerHTML = '';
   items.forEach((item, index) => {
     const row = document.createElement('tr');
-    row.innerHTML = `
-<td>
+    <td contenteditable="true" oninput="updateData(${index}, 'image', this.innerText)">
   <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
+  <div>${item.image}</div>
 </td>
+
 
   <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
@@ -92,13 +93,16 @@ function exportData() {
 
 
 function updateData(index, key, value) {
-  data[index][key] = value;
-  localStorage.setItem('inventoryData', JSON.stringify(data));
-  
-  // ✅ Nếu người dùng sửa link ảnh, thì render lại bảng để ảnh cập nhật
+  items[index][key] = value;
+
+  // Nếu key là 'image' thì đổi luôn ảnh đang hiển thị
   if (key === 'image') {
-    renderTable(data);
+    const row = tableBody.children[index];
+    const img = row.querySelector('img');
+    if (img) img.src = value;
   }
+  
+  localStorage.setItem('items', JSON.stringify(items));
 }
 
 function deleteByRowIndex() {
