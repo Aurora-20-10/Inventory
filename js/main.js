@@ -24,9 +24,6 @@ function renderTable(items) {
   <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${item.date}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${item.status}</td>
   <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${item.note}</td>
-  <td contenteditable="true" oninput="updateData(${index}, 'qr', this.innerText)">
-    <a href="${item.qr}" target="_blank">🔗 QR</a>
-  </td>
 `;
     tableBody.appendChild(row);
   });
