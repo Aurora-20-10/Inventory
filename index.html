@@ -39,6 +39,7 @@
   <table id="itemTable">
     <thead>
       <tr>
+        <th><input type="checkbox" id="selectAll"></th>
         <th>Ảnh</th>
         <th>Tên</th>
         <th>Phân loại</th>
@@ -50,10 +51,8 @@
     <tbody></tbody>
   </table>
 
-  <div id="deleteRowControl" style="margin-top: 20px;">
-    <label for="rowIndexInput">Nhập số thứ tự hàng muốn xoá:</label>
-    <input type="number" id="rowIndexInput" min="1" placeholder="VD: 1">
-    <button onclick="deleteByRowIndex()">❌ Xoá dòng</button>
+  <div style="margin-top: 20px;">
+    <button onclick="deleteSelectedRows()">❌ Xoá các dòng đã chọn</button>
   </div>
 
   <script src="data/items.js"></script>
