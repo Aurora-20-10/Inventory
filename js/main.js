@@ -1,7 +1,8 @@
-const storedData = localStorage.getItem('inventoryData');
-if (storedData) {
-  data = JSON.parse(storedData);
+const savedData = localStorage.getItem('inventoryData');
+if (savedData) {
+  data = JSON.parse(savedData);
 }
+
 
 
 const tableBody = document.querySelector('#itemTable tbody');
