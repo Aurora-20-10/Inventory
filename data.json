@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Bàn phím Fun60",
+    "group": "Thiết bị",
+    "date": "2024-06",
+    "status": "Đang dùng",
+    "note": "Có LED đỏ",
+    "image": "https://i.imgur.com/abc123.png",
+    "qr": "https://i.imgur.com/qrfun60.png"
+  },
+  {
+    "name": "Tai nghe X11",
+    "group": "Thiết bị",
+    "date": "2024-05",
+    "status": "Hỏng",
+    "note": "Đứt dây trái",
+    "image": "https://i.imgur.com/x11img.png",
+    "qr": "https://i.imgur.com/qrx11.png"
+  }
+]
