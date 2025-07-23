@@ -1,3 +1,8 @@
+const storedData = localStorage.getItem('inventoryData');
+if (storedData) {
+  data = JSON.parse(storedData);
+}
+
 const tableBody = document.querySelector('#itemTable tbody');
 const categoryFilter = document.getElementById('categoryFilter');
 const searchInput = document.getElementById('searchInput');
