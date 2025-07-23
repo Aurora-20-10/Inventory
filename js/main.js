@@ -14,31 +14,26 @@ const categoryFilter = document.getElementById('categoryFilter');
 const searchInput    = document.getElementById('searchInput');
 const addForm        = document.getElementById('addForm');
 
-function renderTable(items = data) {
+function renderTable(items) {
   tableBody.innerHTML = '';
-  items.forEach((item, index) => {
+  items.forEach((item) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td><input type="checkbox" class="rowCheckbox" data-index="${index}"></td>
-      <td onpaste="handleImagePaste(event, ${index})" style="padding:0; cursor:pointer;">
+      <td><input type="checkbox" class="rowCheckbox" data-index="${data.indexOf(item)}"></td>
+      <td onpaste="handleImagePaste(event, ${data.indexOf(item)})" style="padding:0; cursor:pointer;">
         <img src="${item.image || 'https://via.placeholder.com/80'}" alt="img" style="display:block; max-height:60px;">
       </td>
-      <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${escapeHTML(item.status)}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${escapeHTML(item.note)}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${escapeHTML(item.date)}</td>
+      <td contenteditable="true" oninput="updateData(${data.indexOf(item)}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
+      <td contenteditable="true" oninput="updateData(${data.indexOf(item)}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
+      <td contenteditable="true" oninput="updateData(${data.indexOf(item)}, 'status', this.innerText)">${escapeHTML(item.status)}</td>
+      <td contenteditable="true" oninput="updateData(${data.indexOf(item)}, 'note', this.innerText)">${escapeHTML(item.note)}</td>
+      <td contenteditable="true" oninput="updateData(${data.indexOf(item)}, 'date', this.innerText)">${escapeHTML(item.date)}</td>
     `;
     tableBody.appendChild(row);
   });
-
-  document.getElementById("selectAll")?.addEventListener("change", function () {
-    const checked = this.checked;
-    document.querySelectorAll(".rowCheckbox").forEach(cb => cb.checked = checked);
-  });
 }
 
-function escapeHTML(str = '') {
+function escapeHTML(str='') {
   return String(str)
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
@@ -74,7 +69,7 @@ categoryFilter.addEventListener('change', updateFilter);
 searchInput.addEventListener('input', updateFilter);
 
 initFilters();
-renderTable();
+renderTable(data);
 
 addForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -93,7 +88,7 @@ addForm.addEventListener('submit', function (e) {
 
   addForm.reset();
   initFilters();
-  renderTable();
+  renderTable(data);
 });
 
 function exportData() {
@@ -118,23 +113,19 @@ function updateData(index, key, value) {
 }
 window.updateData = updateData;
 
-function deleteByRowIndex() {
-  const input = document.getElementById('rowIndexInput');
-  const index = parseInt(input.value, 10) - 1;
-  if (isNaN(index) || index < 0 || index >= data.length) {
-    alert('Số dòng không hợp lệ!');
-    return;
-  }
+function deleteSelectedRows() {
+  const checkboxes = document.querySelectorAll('.rowCheckbox:checked');
+  if (!checkboxes.length) return alert('Chưa chọn dòng nào để xoá!');
+  if (!confirm(`Xoá ${checkboxes.length} dòng đã chọn?`)) return;
 
-  if (confirm(`Xoá dòng số ${index + 1}?`)) {
-    data.splice(index, 1);
-    localStorage.setItem('inventoryData', JSON.stringify(data));
-    input.value = '';
-    initFilters();
-    renderTable();
-  }
+  const indexes = Array.from(checkboxes).map(cb => parseInt(cb.dataset.index, 10));
+  indexes.sort((a, b) => b - a).forEach(i => data.splice(i, 1));
+
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  renderTable(data);
+  initFilters();
 }
-window.deleteByRowIndex = deleteByRowIndex;
+window.deleteSelectedRows = deleteSelectedRows;
 
 function handleImagePaste(e, index) {
   e.preventDefault();
@@ -143,7 +134,7 @@ function handleImagePaste(e, index) {
 
   data[index].image = link;
   localStorage.setItem('inventoryData', JSON.stringify(data));
-  renderTable();
+  renderTable(data);
 }
 window.handleImagePaste = handleImagePaste;
 
@@ -174,7 +165,7 @@ function importData() {
 
       localStorage.setItem('inventoryData', JSON.stringify(data));
       initFilters();
-      renderTable();
+      renderTable(data);
       alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
 
     } catch (err) {
@@ -184,26 +175,3 @@ function importData() {
   reader.readAsText(file);
 }
 window.importData = importData;
-
-/* === XOÁ CÁC DÒNG ĐÃ CHỌN BẰNG CHECKBOX === */
-function deleteSelectedRows() {
-  const checkboxes = document.querySelectorAll(".rowCheckbox:checked");
-  if (checkboxes.length === 0) {
-    alert("Vui lòng chọn ít nhất một dòng để xoá.");
-    return;
-  }
-
-  if (!confirm(`Xoá ${checkboxes.length} dòng đã chọn?`)) return;
-
-  const indexesToDelete = Array.from(checkboxes).map(cb => parseInt(cb.getAttribute("data-index")));
-
-  // Xoá từ cuối lên
-  for (let i = indexesToDelete.length - 1; i >= 0; i--) {
-    data.splice(indexesToDelete[i], 1);
-  }
-
-  localStorage.setItem('inventoryData', JSON.stringify(data));
-  initFilters();
-  renderTable();
-}
-window.deleteSelectedRows = deleteSelectedRows;
