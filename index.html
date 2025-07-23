@@ -1,67 +1,181 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Quản Lý Tài Sản Cá Nhân</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
+// Quản Lý Tài Sản Cá Nhân - Aurora
+let data = Array.isArray(window.data) ? [...window.data] : [];
 
-  <!-- Thanh lọc và tìm kiếm -->
-  <div class="filter-bar">
-    <label for="categoryFilter">Phân loại:</label>
-    <select id="categoryFilter">
-      <option value="">Tất cả</option>
-    </select>
+const savedData = localStorage.getItem('inventoryData');
+if (savedData) {
+  try {
+    const parsed = JSON.parse(savedData);
+    if (Array.isArray(parsed)) data = parsed;
+  } catch (_) {}
+}
 
-    <label for="searchInput">Tìm kiếm:</label>
-    <input type="text" id="searchInput" placeholder="Nhập từ khóa...">
-  </div>
+const tableBody      = document.querySelector('#itemTable tbody');
+const categoryFilter = document.getElementById('categoryFilter');
+const searchInput    = document.getElementById('searchInput');
+const addForm        = document.getElementById('addForm');
 
-  <!-- Form thêm tài sản -->
-  <h3>➕ Thêm Tài Sản Mới</h3>
-  <form id="addForm" autocomplete="off">
-    <input type="text" id="newName" placeholder="Tên" required>
-    <input type="text" id="newCategory" placeholder="Phân loại" required>
-    <input type="date" id="newDate" required>
-    <input type="text" id="newStatus" placeholder="Trạng thái" required>
-    <input type="text" id="newNote" placeholder="Ghi chú">
-    <input type="url" id="newImage" placeholder="Link ảnh (https://...)">
-    <button type="submit">Thêm</button>
-  </form>
+function renderTable(items) {
+  tableBody.innerHTML = '';
+  items.forEach((item, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td onpaste="handleImagePaste(event, ${index})" style="padding:0; cursor:pointer;">
+        <img src="${item.image || 'https://via.placeholder.com/80'}" alt="img" style="display:block; max-height:60px;">
+      </td>
+      <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${escapeHTML(item.status)}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${escapeHTML(item.note)}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${escapeHTML(item.date)}</td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
 
-  <!-- Nút export/import JSON -->
-  <div style="margin-top: 20px;">
-    <button onclick="exportData()">📤 Xuất JSON</button>
-    <input type="file" id="importJsonInput" accept=".json">
-    <button onclick="importData()">📥 Nhập JSON</button>
-  </div>
+function escapeHTML(str='') {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;');
+}
 
-  <!-- Bảng hiển thị tài sản -->
-  <table id="itemTable" style="margin-top: 20px; width: 100%; border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th><input type="checkbox" id="selectAll"></th>
-        <th>Ảnh</th>
-        <th>Tên</th>
-        <th>Phân loại</th>
-        <th>Trạng thái</th>
-        <th>Ghi chú</th>
-        <th>Ngày mua</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+function updateFilter() {
+  const category = categoryFilter.value;
+  const keyword  = searchInput.value.trim().toLowerCase();
+  const filtered = data.filter(item => {
+    const matchCategory = !category || item.category === category;
+    const matchKeyword  = !keyword ||
+      (item.name   && item.name.toLowerCase().includes(keyword)) ||
+      (item.note   && item.note.toLowerCase().includes(keyword)) ||
+      (item.status && item.status.toLowerCase().includes(keyword));
+    return matchCategory && matchKeyword;
+  });
+  renderTable(filtered);
+}
 
-  <!-- Nút xoá dòng -->
-  <div style="margin-top: 20px;">
-    <button onclick="deleteSelectedRows()">❌ Xoá các dòng đã chọn</button>
-  </div>
+function initFilters() {
+  categoryFilter.innerHTML = '<option value="">Tất cả</option>';
+  const categories = [...new Set(data.map(item => item.category).filter(Boolean))];
+  categories.forEach(cat => {
+    const option = document.createElement('option');
+    option.value = cat;
+    option.textContent = cat;
+    categoryFilter.appendChild(option);
+  });
+}
 
-  <!-- Dữ liệu và script -->
-  <script src="data/items.js"></script>
-  <script src="js/main.js"></script>
-</body>
-</html>
+categoryFilter.addEventListener('change', updateFilter);
+searchInput.addEventListener('input', updateFilter);
+
+initFilters();
+renderTable(data);
+
+addForm.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  const newItem = {
+    name:     document.getElementById('newName').value.trim(),
+    category: document.getElementById('newCategory').value.trim(),
+    date:     document.getElementById('newDate').value,
+    status:   document.getElementById('newStatus').value.trim(),
+    note:     document.getElementById('newNote').value.trim(),
+    image:    document.getElementById('newImage').value.trim() || 'https://via.placeholder.com/80'
+  };
+
+  data.push(newItem);
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+
+  addForm.reset();
+  initFilters();
+  renderTable(data);
+});
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = 'inventory_backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+window.exportData = exportData;
+
+function updateData(index, key, value) {
+  data[index][key] = value.trim();
+  if (key === 'image') {
+    const row = tableBody.children[index];
+    const img = row?.querySelector('img');
+    if (img) img.src = value.trim() || 'https://via.placeholder.com/80';
+  }
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+}
+window.updateData = updateData;
+
+function deleteByRowIndex() {
+  const input = document.getElementById('rowIndexInput');
+  const index = parseInt(input.value, 10) - 1;
+  if (isNaN(index) || index < 0 || index >= data.length) {
+    alert('Số dòng không hợp lệ!');
+    return;
+  }
+
+  if (confirm(`Xoá dòng số ${index + 1}?`)) {
+    data.splice(index, 1);
+    localStorage.setItem('inventoryData', JSON.stringify(data));
+    input.value = '';
+    initFilters();
+    renderTable(data);
+  }
+}
+window.deleteByRowIndex = deleteByRowIndex;
+
+function handleImagePaste(e, index) {
+  e.preventDefault();
+  const link = (e.clipboardData || window.clipboardData).getData('text').trim();
+  if (!link || !link.startsWith('http')) return;
+
+  data[index].image = link;
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  renderTable(data);
+}
+window.handleImagePaste = handleImagePaste;
+
+/* --- NHẬP JSON BỔ SUNG + CHỐNG TRÙNG --- */
+function importData() {
+  const fileInput = document.getElementById('importJsonInput');
+  const file = fileInput.files[0];
+  if (!file) return alert('Vui lòng chọn một file JSON!');
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const newData = JSON.parse(e.target.result);
+      if (!Array.isArray(newData)) throw new Error();
+
+      const existingKeys = new Set(
+        data.map(item => `${item.name}|${item.category}|${item.date}`)
+      );
+
+      let addedCount = 0;
+      newData.forEach(item => {
+        const key = `${item.name}|${item.category}|${item.date}`;
+        if (!existingKeys.has(key)) {
+          data.push(item);
+          existingKeys.add(key);
+          addedCount++;
+        }
+      });
+
+      localStorage.setItem('inventoryData', JSON.stringify(data));
+      initFilters();
+      renderTable(data);
+      alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
+
+    } catch (err) {
+      alert("File JSON không hợp lệ!");
+    }
+  };
+  reader.readAsText(file);
+}
+window.importData = importData;
