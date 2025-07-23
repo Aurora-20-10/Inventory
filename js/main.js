@@ -162,3 +162,30 @@ function handleImagePaste(e, index) {
   renderTable(data);
 }
 window.handleImagePaste = handleImagePaste;
+
+/* --- NHẬP JSON --- */
+function importData() {
+  const fileInput = document.getElementById('importJsonInput');
+  const file = fileInput.files[0];
+  if (!file) return alert('Vui lòng chọn một file JSON!');
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      const newData = JSON.parse(e.target.result);
+      if (!Array.isArray(newData)) throw new Error();
+
+      if (confirm("Bạn có chắc muốn ghi đè toàn bộ dữ liệu hiện tại?")) {
+        data = newData;
+        localStorage.setItem('inventoryData', JSON.stringify(data));
+        initFilters();
+        renderTable(data);
+        alert("Đã nhập JSON thành công!");
+      }
+    } catch (err) {
+      alert("File JSON không hợp lệ!");
+    }
+  };
+  reader.readAsText(file);
+}
+window.importData = importData;
