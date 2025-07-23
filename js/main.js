@@ -14,9 +14,8 @@ function renderTable(items) {
   items.forEach((item, index) => {
     const row = document.createElement('tr');
     row.innerHTML = `
-      <td>
-      <td contenteditable="true" onpaste="handleImagePaste(event, ${index})" style="padding:0;">
-  <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
+      <td onpaste="handleImagePaste(event, ${index})" style="padding:0;">
+        <img src="${item.image}" alt="img" style="display:block; max-height: 60px;">
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${item.name}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${item.category}</td>
@@ -27,9 +26,6 @@ function renderTable(items) {
     tableBody.appendChild(row);
   });
 }
-
-
-
 
 function updateFilter() {
   const category = categoryFilter.value;
@@ -43,6 +39,7 @@ function updateFilter() {
 }
 
 function initFilters() {
+  categoryFilter.innerHTML = '<option value="">Tất cả</option>'; // reset lại
   const categories = [...new Set(data.map(item => item.category))];
   categories.forEach(cat => {
     const option = document.createElement('option');
@@ -75,13 +72,10 @@ addForm.addEventListener('submit', function (e) {
   data.push(newItem);
   localStorage.setItem('inventoryData', JSON.stringify(data));
   renderTable(data);
-  
-  initFilters(); // để cập nhật thêm category mới vào select
-
-  addForm.reset(); // reset form
+  initFilters();
+  addForm.reset();
 });
 
-// 1. Xuất dữ liệu ra JSON
 function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -106,7 +100,7 @@ function updateData(index, key, value) {
 
 function deleteByRowIndex() {
   const input = document.getElementById('rowIndexInput');
-  const index = parseInt(input.value) - 1; // Vì người nhập từ 1, mảng từ 0
+  const index = parseInt(input.value) - 1;
 
   if (isNaN(index) || index < 0 || index >= data.length) {
     alert('Số dòng không hợp lệ!');
@@ -117,13 +111,12 @@ function deleteByRowIndex() {
     data.splice(index, 1);
     localStorage.setItem('inventoryData', JSON.stringify(data));
     renderTable(data);
-    input.value = ''; // reset sau khi xoá
+    input.value = '';
   }
 }
 
 function handleImagePaste(e, index) {
-  e.preventDefault(); // Chặn dán mặc định
-
+  e.preventDefault();
   const link = (e.clipboardData || window.clipboardData).getData('text');
   if (!link.startsWith('http')) return;
 
