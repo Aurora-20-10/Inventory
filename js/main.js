@@ -1,3 +1,5 @@
+let data = []; 
+
 const savedData = localStorage.getItem('inventoryData');
 if (savedData) {
   data = JSON.parse(savedData);
