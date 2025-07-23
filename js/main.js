@@ -72,6 +72,8 @@ addForm.addEventListener('submit', function (e) {
   };
 
   data.push(newItem);
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+
   renderTable(data);
 // 1. Xuất dữ liệu ra JSON
 function exportData() {
