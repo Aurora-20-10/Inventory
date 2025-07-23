@@ -94,3 +94,20 @@ function updateData(index, key, value) {
   data[index][key] = value;
   localStorage.setItem('inventoryData', JSON.stringify(data));
 }
+
+function deleteByRowIndex() {
+  const input = document.getElementById('rowIndexInput');
+  const index = parseInt(input.value) - 1; // Vì người nhập từ 1, mảng từ 0
+
+  if (isNaN(index) || index < 0 || index >= data.length) {
+    alert('Số dòng không hợp lệ!');
+    return;
+  }
+
+  if (confirm(`Xoá dòng số ${index + 1}?`)) {
+    data.splice(index, 1);
+    localStorage.setItem('inventoryData', JSON.stringify(data));
+    renderTable(data);
+    input.value = ''; // reset sau khi xoá
+  }
+}
