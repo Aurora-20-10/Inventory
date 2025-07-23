@@ -22,6 +22,8 @@ function renderTable(items) {
     <a href="${item.qr}" target="_blank">🔗 QR</a>
   </td>
 `;
+    tableBody.appendChild(row);
+  });
 }
 
 
