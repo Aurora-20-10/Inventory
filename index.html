@@ -19,7 +19,19 @@
     <label for="searchInput">Tìm kiếm:</label>
     <input type="text" id="searchInput" placeholder="Nhập từ khóa...">
   </div>
+<h3>➕ Thêm Tài Sản Mới</h3>
+<form id="addForm">
+  <input type="text" id="newName" placeholder="Tên" required>
+  <input type="text" id="newCategory" placeholder="Phân loại" required>
+  <input type="date" id="newDate" required>
+  <input type="text" id="newStatus" placeholder="Trạng thái" required>
+  <input type="text" id="newNote" placeholder="Ghi chú">
+  <input type="url" id="newImage" placeholder="Link ảnh (https://...)">
+  <input type="url" id="newQR" placeholder="Link QR (https://...)">
+  <button type="submit">Thêm</button>
+</form>
 
+  
   <table id="itemTable">
     <thead>
       <tr>
