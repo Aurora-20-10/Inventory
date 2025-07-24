@@ -4,7 +4,6 @@ import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/fireb
 
 // TODO: Replace with your Firebase project configuration
 const firebaseConfig = {
-const firebaseConfig = {
   apiKey: "AIzaSyBg7oJvinUO4Se3M44YymHeIK8rxVlx43A",
   authDomain: "fir-ai-app-1b91d.firebaseapp.com",
   projectId: "fir-ai-app-1b91d",
