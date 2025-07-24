@@ -12,8 +12,6 @@ const tableBody = document.querySelector('#itemTable tbody');
 const categoryFilter = document.getElementById('categoryFilter');
 const searchInput = document.getElementById('searchInput');
 const addForm = document.getElementById('addForm');
-let sortKey = '';
-let sortAsc = true;
 
 function renderTable(items) {
   tableBody.innerHTML = '';
@@ -45,28 +43,6 @@ function escapeHTML(str='') {
     .replace(/>/g,'&gt;');
 }
 
-function sortItems(items) {
-  if (!sortKey) return items;
-  return [...items].sort((a, b) => {
-    const valA = (a[sortKey] || '').toLowerCase();
-    const valB = (b[sortKey] || '').toLowerCase();
-    if (valA < valB) return sortAsc ? -1 : 1;
-    if (valA > valB) return sortAsc ? 1 : -1;
-    return 0;
-  });
-}
-
-function sortBy(key) {
-  if (sortKey === key) {
-    sortAsc = !sortAsc;
-  } else {
-    sortKey = key;
-    sortAsc = true;
-  }
-  updateFilter();
-}
-window.sortBy = sortBy;
-
 function updateFilter() {
   const category = categoryFilter.value;
   const keyword = searchInput.value.trim().toLowerCase();
@@ -78,7 +54,7 @@ function updateFilter() {
       (item.status && item.status.toLowerCase().includes(keyword));
     return matchCategory && matchKeyword;
   });
-  renderTable(sortItems(filtered));
+   renderTable(filtered);
 }
 
 function initFilters() {
@@ -96,7 +72,7 @@ categoryFilter.addEventListener('change', updateFilter);
 searchInput.addEventListener('input', updateFilter);
 
 initFilters();
-updateFilter();
+ renderTable(data);
 
 addForm.addEventListener('submit', function (e) {
   e.preventDefault();
@@ -113,7 +89,7 @@ addForm.addEventListener('submit', function (e) {
   localStorage.setItem('inventoryData', JSON.stringify(data));
   addForm.reset();
   initFilters();
-  updateFilter();
+   renderTable(data);
 });
 
 function exportData() {
@@ -130,7 +106,7 @@ window.exportData = exportData;
 function updateData(index, key, value) {
   data[index][key] = value.trim();
   localStorage.setItem('inventoryData', JSON.stringify(data));
-  updateFilter();
+   renderTable(data);
 }
 window.updateData = updateData;
 
@@ -147,7 +123,7 @@ function deleteByRowIndex() {
     localStorage.setItem('inventoryData', JSON.stringify(data));
     input.value = '';
     initFilters();
-  updateFilter();
+   renderTable(data);
   }
 }
 window.deleteByRowIndex = deleteByRowIndex;
@@ -179,7 +155,7 @@ function importData() {
 
       localStorage.setItem('inventoryData', JSON.stringify(data));
       initFilters();
-        updateFilter();
+         renderTable(data);
       alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
     } catch (err) {
       alert("File JSON không hợp lệ!");
