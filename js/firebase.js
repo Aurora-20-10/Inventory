@@ -4,12 +4,13 @@ import { getFirestore, doc, getDoc, setDoc } from 'https://www.gstatic.com/fireb
 
 // TODO: Replace with your Firebase project configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+const firebaseConfig = {
+  apiKey: "AIzaSyBg7oJvinUO4Se3M44YymHeIK8rxVlx43A",
+  authDomain: "fir-ai-app-1b91d.firebaseapp.com",
+  projectId: "fir-ai-app-1b91d",
+  storageBucket: "fir-ai-app-1b91d.firebasestorage.app",
+  messagingSenderId: "17060666178",
+  appId: "1:17060666178:web:3b04c61201be8f83cd46db"
 };
 
 const app = initializeApp(firebaseConfig);
