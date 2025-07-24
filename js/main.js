@@ -1,17 +1,22 @@
-let data = Array.isArray(window.data) ? [...window.data] : [];
-
-const savedData = localStorage.getItem('inventoryData');
-if (savedData) {
-  try {
-    const parsed = JSON.parse(savedData);
-    if (Array.isArray(parsed)) data = parsed;
-  } catch (_) {}
+let data = [];
+if (typeof window !== 'undefined') {
+  data = Array.isArray(window.data) ? [...window.data] : [];
+  const savedData = localStorage.getItem('inventoryData');
+  if (savedData) {
+    try {
+      const parsed = JSON.parse(savedData);
+      if (Array.isArray(parsed)) data = parsed;
+    } catch (_) {}
+  }
 }
 
-const tableBody = document.querySelector('#itemTable tbody');
-const categoryFilter = document.getElementById('categoryFilter');
-const searchInput = document.getElementById('searchInput');
-const addForm = document.getElementById('addForm');
+let tableBody, categoryFilter, searchInput, addForm;
+if (typeof document !== 'undefined') {
+  tableBody = document.querySelector('#itemTable tbody');
+  categoryFilter = document.getElementById('categoryFilter');
+  searchInput = document.getElementById('searchInput');
+  addForm = document.getElementById('addForm');
+}
 
 function isImageLink(str='') {
   return /^https?:\/\//i.test(str.trim());
@@ -95,6 +100,7 @@ addForm.addEventListener('submit', function (e) {
 
   data.push(newItem);
   localStorage.setItem('inventoryData', JSON.stringify(data));
+  if (typeof saveToFirestore === 'function') saveToFirestore();
   addForm.reset();
   initFilters();
    renderTable(data);
@@ -116,12 +122,14 @@ function editImage(index) {
   if (url === null) return; // cancel
   data[index].image = url.trim() || 'https://via.placeholder.com/80';
   localStorage.setItem('inventoryData', JSON.stringify(data));
+  if (typeof saveToFirestore === 'function') saveToFirestore();
   renderTable(data);
 }
 window.editImage = editImage;
 function updateData(index, key, value) {
   data[index][key] = value.trim();
   localStorage.setItem('inventoryData', JSON.stringify(data));
+  if (typeof saveToFirestore === 'function') saveToFirestore();
    renderTable(data);
 }
 window.updateData = updateData;
@@ -130,6 +138,7 @@ function deleteRow(index) {
   if (confirm(`Xoá dòng số ${index + 1}?`)) {
     data.splice(index, 1);
     localStorage.setItem('inventoryData', JSON.stringify(data));
+    if (typeof saveToFirestore === 'function') saveToFirestore();
     initFilters();
     renderTable(data);
   }
@@ -147,6 +156,7 @@ function deleteByRowIndex() {
   if (confirm(`Xoá dòng số ${index + 1}?`)) {
     data.splice(index, 1);
     localStorage.setItem('inventoryData', JSON.stringify(data));
+    if (typeof saveToFirestore === 'function') saveToFirestore();
     input.value = '';
     initFilters();
    renderTable(data);
@@ -180,6 +190,7 @@ function importData() {
       });
 
       localStorage.setItem('inventoryData', JSON.stringify(data));
+      if (typeof saveToFirestore === 'function') saveToFirestore();
       initFilters();
          renderTable(data);
       alert(`✅ Đã bổ sung ${addedCount} mục mới (bỏ qua mục trùng).`);
