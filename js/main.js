@@ -160,7 +160,7 @@ function deleteRow(index) {
     renderTable(data);
   }
 }
-window.deleteRow = deleteRow;
+if (typeof window !== 'undefined') window.deleteRow = deleteRow;
 
 function importData() {
   const fileInput = document.getElementById('importJsonInput');
