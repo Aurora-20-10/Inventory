@@ -98,14 +98,15 @@ function initFilters() {
   });
 }
 
-categoryFilter.addEventListener('change', updateFilter);
-searchInput.addEventListener('input', updateFilter);
+if (typeof document !== 'undefined') {
+  categoryFilter.addEventListener('change', updateFilter);
+  searchInput.addEventListener('input', updateFilter);
 
-initFilters();
- renderTable(data);
+  initFilters();
+  renderTable(data);
 
-addForm.addEventListener('submit', function (e) {
-  e.preventDefault();
+  addForm.addEventListener('submit', function (e) {
+    e.preventDefault();
   const newItem = {
     name: document.getElementById('newName').value.trim(),
     category: document.getElementById('newCategory').value.trim(),
