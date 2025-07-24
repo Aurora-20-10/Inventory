@@ -145,25 +145,6 @@ function deleteRow(index) {
 }
 window.deleteRow = deleteRow;
 
-function deleteByRowIndex() {
-  const input = document.getElementById('rowIndexInput');
-  const index = parseInt(input.value, 10) - 1;
-  if (isNaN(index) || index < 0 || index >= data.length) {
-    alert('Số dòng không hợp lệ!');
-    return;
-  }
-
-  if (confirm(`Xoá dòng số ${index + 1}?`)) {
-    data.splice(index, 1);
-    localStorage.setItem('inventoryData', JSON.stringify(data));
-    if (typeof saveToFirestore === 'function') saveToFirestore();
-    input.value = '';
-    initFilters();
-   renderTable(data);
-  }
-}
-window.deleteByRowIndex = deleteByRowIndex;
-
 function importData() {
   const fileInput = document.getElementById('importJsonInput');
   const file = fileInput.files[0];
