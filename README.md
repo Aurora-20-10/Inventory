@@ -1,6 +1,6 @@
 # Inventory
 A small static web app for tracking personal items. Everything runs directly in the browser using plain HTML, CSS and JavaScript, so no build process is required.
-Data is saved locally in `localStorage` under the key `inventoryData` whenever you add or edit an item.
+Data is saved locally in `localStorage` under the key `inventoryData` whenever you add or edit an item. You can also sign in with a Google account to sync your data between devices.
 
 # How to Run
 Simply open index.html in any browser – no server setup required.
