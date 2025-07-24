@@ -49,23 +49,27 @@ export function initAuth() {
       signInBtn.style.display = 'none';
       signOutBtn.style.display = '';
       loadData(user.uid).then(() => {
-        if (typeof initFilters === 'function') {
-        if (typeof window.updateDataFromAuth === 'function') {
-          window.updateDataFromAuth(window.data);
-        } else if (typeof initFilters === 'function') {
-          initFilters();
-          renderTable(window.data);
-        }
-      });
+          if (typeof window.updateDataFromAuth === 'function') {
+            window.updateDataFromAuth(window.data);
+          } else if (typeof window.initFilters === 'function') {
+            window.initFilters();
+            if (typeof window.renderTable === 'function') {
+              window.renderTable(window.data);
+            }
+          }
+        });
     } else {
       userLabel.textContent = 'Chưa đăng nhập';
       signInBtn.style.display = '';
       signOutBtn.style.display = 'none';
       window.data = JSON.parse(localStorage.getItem('inventoryData') || '[]');
-      if (typeof initFilters === 'function') {
-        initFilters();
-        renderTable(window.data);
-      }
+       if (typeof window.initFilters === 'function') {
+          window.initFilters();
+          if (typeof window.renderTable === 'function') {
+            window.renderTable(window.data);
+          }
+        }
+    }
     }
   });
 }
