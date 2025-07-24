@@ -31,6 +31,8 @@ items.forEach((item) => {
       <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${escapeHTML(item.status)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${escapeHTML(item.note)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${escapeHTML(item.date)}</td>
+      <td><button onclick="deleteRow(${index})">❌</button></td>
+
     `;
     tableBody.appendChild(row);
   });
@@ -109,6 +111,16 @@ function updateData(index, key, value) {
    renderTable(data);
 }
 window.updateData = updateData;
+
+function deleteRow(index) {
+  if (confirm(`Xoá dòng số ${index + 1}?`)) {
+    data.splice(index, 1);
+    localStorage.setItem('inventoryData', JSON.stringify(data));
+    initFilters();
+    renderTable(data);
+  }
+}
+window.deleteRow = deleteRow;
 
 function deleteByRowIndex() {
   const input = document.getElementById('rowIndexInput');
