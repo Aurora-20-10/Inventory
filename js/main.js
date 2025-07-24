@@ -187,3 +187,5 @@ function importData() {
   reader.readAsText(file);
 }
 window.importData = importData;
+
+if (typeof module !== "undefined") { module.exports = { escapeHTML }; }
