@@ -4,12 +4,19 @@ A small static web app for tracking personal items. Everything runs directly in 
 
 Data is saved locally in `localStorage` under the key `inventoryData` whenever you add or edit an item.
 
-## Usage
+How to Run
+Simply open index.html in any browser – no server setup required.
 
-1. Clone or download this repository.
-2. Open `index.html` in your web browser.
-3. Use the form to add assets or edit cells in the table. Changes persist automatically.
-4. Click **Export JSON** to download a backup of your items.
-5. Choose a file next to **Import JSON** and press the button to merge data from a previous backup.
+Folder Structure
+index.html – the main page of the application.
 
-The app stores everything only in your browser until you export it.
+style.css – handles the interface styling.
+
+js/main.js – processes logic, data storage, JSON export and import.
+
+data/items.js – optional file containing sample data for preloading.
+
+Exporting and Importing Data
+The 📤 Export JSON button creates a file named inventory_backup.json containing the full current list.
+The 📥 Import JSON button lets you select a JSON file to add more data.
+All data is stored in localStorage, so it remains intact even after refreshing the page.
