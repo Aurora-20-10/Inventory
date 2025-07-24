@@ -17,7 +17,8 @@ let sortAsc = true;
 
 function renderTable(items) {
   tableBody.innerHTML = '';
-  items.forEach((item, index) => {
+items.forEach((item) => {
+    const index = data.indexOf(item); // correct index within main array
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>
