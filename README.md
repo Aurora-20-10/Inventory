@@ -4,6 +4,8 @@ Data is saved locally in `localStorage` under the key `inventoryData` whenever y
 
 # How to Run
 Simply open index.html in any browser – no server setup required.
+For online syncing, update `js/firebase.js` with your own Firebase project configuration.
+After launching the page, use the **Đăng nhập bằng Google** button to sign in and keep your items synchronized across devices.
 
 # Folder Structure
 index.html – the main page of the application.
