@@ -10,30 +10,29 @@ if (typeof window !== 'undefined') {
   }
 }
 
-let tableBody, categoryFilter, searchInput, addForm;
+let tableBody, categoryFilter, searchInput, addForm, overlay, overlayImg;
 if (typeof document !== 'undefined') {
   tableBody = document.querySelector('#itemTable tbody');
   categoryFilter = document.getElementById('categoryFilter');
   searchInput = document.getElementById('searchInput');
   addForm = document.getElementById('addForm');
-}
-
-const overlay = document.getElementById('imageOverlay');
-const overlayImg = overlay ? overlay.querySelector('img') : null;
+  overlay = document.getElementById('imageOverlay');
+  overlayImg = overlay ? overlay.querySelector('img') : null;
+}  
 
 function showOverlay(url) {
   if (!overlayImg) return;
   overlayImg.src = url;
   overlay.classList.add('show');
 }
-window.showOverlay = showOverlay;
+if (typeof window !== 'undefined') window.showOverlay = showOverlay;
 
 function hideOverlay() {
   if (!overlayImg) return;
   overlay.classList.remove('show');
   overlayImg.src = '';
 }
-window.hideOverlay = hideOverlay;
+if (typeof window !== 'undefined') window.hideOverlay = hideOverlay;
 
 function isImageLink(str='') {
   return /^https?:\/\//i.test(str.trim());
@@ -133,7 +132,7 @@ function exportData() {
   a.click();
   URL.revokeObjectURL(url);
 }
-window.exportData = exportData;
+if (typeof window !== 'undefined') window.exportData = exportData;
 
 function editImage(index) {
   const url = prompt('Nhập link ảnh:', data[index].image || '');
@@ -143,14 +142,14 @@ function editImage(index) {
   if (typeof saveToFirestore === 'function') saveToFirestore();
   renderTable(data);
 }
-window.editImage = editImage;
+if (typeof window !== 'undefined') window.editImage = editImage;
 function updateData(index, key, value) {
   data[index][key] = value.trim();
   localStorage.setItem('inventoryData', JSON.stringify(data));
   if (typeof saveToFirestore === 'function') saveToFirestore();
    renderTable(data);
 }
-window.updateData = updateData;
+if (typeof window !== 'undefined') window.updateData = updateData;
 
 function deleteRow(index) {
   if (confirm(`Xoá dòng số ${index + 1}?`)) {
@@ -199,6 +198,14 @@ function importData() {
   };
   reader.readAsText(file);
 }
-window.importData = importData;
+if (typeof window !== 'undefined') window.importData = importData;
+
+  window.updateDataFromAuth = function(items) {
+    data = Array.isArray(items) ? [...items] : [];
+    localStorage.setItem('inventoryData', JSON.stringify(data));
+    initFilters();
+    renderTable(data);
+  };
+}
 
 if (typeof module !== "undefined") { module.exports = { escapeHTML }; }
