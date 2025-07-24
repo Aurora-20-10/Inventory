@@ -18,6 +18,23 @@ if (typeof document !== 'undefined') {
   addForm = document.getElementById('addForm');
 }
 
+const overlay = document.getElementById('imageOverlay');
+const overlayImg = overlay ? overlay.querySelector('img') : null;
+
+function showOverlay(url) {
+  if (!overlayImg) return;
+  overlayImg.src = url;
+  overlay.classList.add('show');
+}
+window.showOverlay = showOverlay;
+
+function hideOverlay() {
+  if (!overlayImg) return;
+  overlay.classList.remove('show');
+  overlayImg.src = '';
+}
+window.hideOverlay = hideOverlay;
+
 function isImageLink(str='') {
   return /^https?:\/\//i.test(str.trim());
 }
@@ -29,8 +46,8 @@ items.forEach((item) => {
     const row = document.createElement('tr');
 
     const noteContent = isImageLink(item.note)
-      ? `<img src="${item.note}" alt="note" style="max-height:60px; display:block;">`
-      : escapeHTML(item.note);  
+      ? `<img src="${item.note}" alt="note" style="max-height:60px; display:block;" onclick="showOverlay('${item.note}')">`
+      : escapeHTML(item.note);
   
     row.innerHTML = `
       <td>
