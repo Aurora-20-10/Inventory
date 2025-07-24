@@ -23,7 +23,12 @@
 </head>
 <body>
   <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
-
+<div id="authBar">
+    <span id="userLabel">Chưa đăng nhập</span>
+    <button id="signInBtn">Đăng nhập bằng Google</button>
+    <button id="signOutBtn" style="display:none">Đăng xuất</button>
+  </div>
+  
   <div class="filter-bar">
     <label for="categoryFilter">Phân loại:</label>
     <select id="categoryFilter">
@@ -73,5 +78,6 @@
   </div>
 
   <script src="js/main.js"></script>
+ <script type="module" src="js/firebase.js"></script>
 </body>
 </html>
