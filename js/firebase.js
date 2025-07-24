@@ -50,6 +50,9 @@ export function initAuth() {
       signOutBtn.style.display = '';
       loadData(user.uid).then(() => {
         if (typeof initFilters === 'function') {
+        if (typeof window.updateDataFromAuth === 'function') {
+          window.updateDataFromAuth(window.data);
+        } else if (typeof initFilters === 'function') {
           initFilters();
           renderTable(window.data);
         }
