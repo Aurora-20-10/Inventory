@@ -45,3 +45,9 @@ form#addForm button {
   font-size: 14px;
 }
 
+td button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 16px;
+}
