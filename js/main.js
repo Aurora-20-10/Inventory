@@ -13,23 +13,32 @@ const categoryFilter = document.getElementById('categoryFilter');
 const searchInput = document.getElementById('searchInput');
 const addForm = document.getElementById('addForm');
 
+function isImageLink(str='') {
+  return /^https?:\/\//i.test(str.trim());
+}
+
 function renderTable(items) {
   tableBody.innerHTML = '';
 items.forEach((item) => {
     const index = data.indexOf(item); // correct index within main array
     const row = document.createElement('tr');
+
+    const noteContent = isImageLink(item.note)
+      ? `<img src="${item.note}" alt="note" style="max-height:60px; display:block;">`
+      : escapeHTML(item.note);  
+  
     row.innerHTML = `
       <td>
         <img src="${item.image || 'https://via.placeholder.com/80'}"
              alt="img" style="max-height:60px; display:block;">
-        <div contenteditable="true" 
+        <div contenteditable="true"
              oninput="updateData(${index}, 'image', this.innerText)"
              style="font-size:10px; max-width:100px; word-break:break-word; border:1px dashed #ccc; margin-top:5px; padding:2px;">${escapeHTML(item.image)}</div>
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'status', this.innerText)">${escapeHTML(item.status)}</td>
-      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${escapeHTML(item.note)}</td>
+      <td contenteditable="true" oninput="updateData(${index}, 'note', this.innerText)">${noteContent}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'date', this.innerText)">${escapeHTML(item.date)}</td>
       <td><button onclick="deleteRow(${index})">❌</button></td>
 
