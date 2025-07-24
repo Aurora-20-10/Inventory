@@ -29,11 +29,8 @@ items.forEach((item) => {
   
     row.innerHTML = `
       <td>
-        <img src="${item.image || 'https://via.placeholder.com/80'}"
-             alt="img" style="max-height:60px; display:block;">
-        <div contenteditable="true"
-             oninput="updateData(${index}, 'image', this.innerText)"
-             style="font-size:10px; max-width:100px; word-break:break-word; border:1px dashed #ccc; margin-top:5px; padding:2px;">${escapeHTML(item.image)}</div>
+         <img src="${escapeHTML(item.image || 'https://via.placeholder.com/80')}"
+             alt="img" style="max-height:60px; display:block;" onclick="editImage(${index})">
       </td>
       <td contenteditable="true" oninput="updateData(${index}, 'name', this.innerText)">${escapeHTML(item.name)}</td>
       <td contenteditable="true" oninput="updateData(${index}, 'category', this.innerText)">${escapeHTML(item.category)}</td>
@@ -114,6 +111,14 @@ function exportData() {
 }
 window.exportData = exportData;
 
+function editImage(index) {
+  const url = prompt('Nhập link ảnh:', data[index].image || '');
+  if (url === null) return; // cancel
+  data[index].image = url.trim() || 'https://via.placeholder.com/80';
+  localStorage.setItem('inventoryData', JSON.stringify(data));
+  renderTable(data);
+}
+window.editImage = editImage;
 function updateData(index, key, value) {
   data[index][key] = value.trim();
   localStorage.setItem('inventoryData', JSON.stringify(data));
