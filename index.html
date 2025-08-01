@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🗃️ Quản Lý Tài Sản Cá Nhân – Mythic UI</title>
+</head>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ==== BASE UI ==== */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(145deg, #1a0933, #0d1a2e);
+  color: #fff;
+  min-height: 100vh;
+  padding: 20px;
+  background-size: 600% 600%;
+  animation: moveGradient 20s ease infinite;
+}
+
+/* Đặt @keyframes ra ngoài */
+@keyframes moveGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ==== HEADINGS ==== */
+h2, h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* ==== CARD STYLE ==== */
+.card {
+  background: rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  margin-bottom: 20px;
+border: 1px solid rgba(255,255,255,0.1);
+transition: 0.4s;
+}
+.card:hover {
+  box-shadow: 0 0 20px rgba(138, 90, 255, 0.4);
+  border-color: rgba(180, 150, 255, 0.3);
+}
+
+/* ==== FORM ==== */
+#addForm input, #addForm button, select {
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+#addForm input, select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+#addForm button {
+  background: #6a4fcf;
+  color: white;
+  font-weight: 600;
+  transition: 0.3s;
+}
+#addForm button:hover {
+  background: #836fff;
+  box-shadow: 0 0 10px #836fff;
+}
+
+/* ==== FORM GRID ==== */
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #eee;
+}
+
+.form-group input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  box-shadow: 0 0 8px #7d5bff;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ==== FORM COMPACT ==== */
+.form-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-compact input {
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  transition: 0.3s;
+  font-size: 14px;
+}
+
+.form-compact input:focus {
+  box-shadow: 0 0 8px #7d5bff;
+  background: rgba(255,255,255,0.12);
+}
+
+/* ==== BUTTON COMPACT ==== */
+.add-btn {
+  background: #6a4fcf;
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  justify-self: center;
+  align-self: center;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  background: #836fff;
+  box-shadow: 0 0 10px #a88eff;
+}
+/* ==== BUTTON FORM ==== */
+.form-button {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.add-btn {
+  background: #6a4fcf;
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  background: #836fff;
+  box-shadow: 0 0 12px #a88eff;
+}
+
+/* ==== CARD CONTAINER ==== */
+#cardContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+/* ==== ASSET CARD ==== */
+.asset-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 15px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  transition: 0.3s;
+  position: relative;
+}
+.asset-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 20px rgba(150,100,255,0.4);
+}
+
+.asset-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+.asset-card img:hover { transform: scale(1.05); }
+
+.asset-card h4 {
+  margin: 5px 0;
+  font-size: 18px;
+}
+
+.asset-card p {
+  margin: 3px 0;
+  font-size: 14px;
+  color: #ddd;
+}
+
+/* ==== DELETE BUTTON ==== */
+.delete-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #c94f4f;
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.delete-btn:hover {
+  background: #ff5f5f;
+  box-shadow: 0 0 10px #ff5f5f;
+}
+
+/* ==== BUTTONS ==== */
+.action-btn {
+  background: #c94f4f;
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.action-btn:hover {
+  background: #ff5f5f;
+  box-shadow: 0 0 8px #ff5f5f;
+}
+button, .file-btn, .action-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+button::before, .file-btn::before, .action-btn::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.3) 10%, transparent 50%);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.4s ease;
+}
+
+button:hover::before, .file-btn:hover::before, .action-btn:hover::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+/* ==== FILTER BAR ==== */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+.filter-bar input, .filter-bar select {
+  flex: 1;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+}
+
+/* ==== IMAGE OVERLAY ==== */
+#imageOverlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+}
+#imageOverlay img {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 12px;
+}
+
+/* ==== FILE BUTTON ==== */
+.file-btn {
+  background: #4fc9b5;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.file-btn:hover {
+  background: #67e1cd;
+  box-shadow: 0 0 8px #67e1cd;
+}
+/* ==== PARTICLE LAYER ==== */
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+/* ==== PARTICLE LAYER ==== */
+#particles {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ✅ NÚT GHI CHÚ */
+.note-btn {
+  background: #4fc9b5;
+  color: white;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+.note-btn:hover {
+  background: #67e1cd;
+  box-shadow: 0 0 8px #67e1cd;
+}
+
+/* ==== NOTE MODAL ==== */
+#noteModal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+#noteModalContent {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+#noteModalContent h3 {
+  margin-top: 0;
+}
+
+#noteModalContent textarea {
+  width: 100%;
+  height: 150px;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  resize: none;
+}
+
+#noteModalContent button {
+  background: #6a4fcf;
+  color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+#noteModalContent button:hover {
+  background: #836fff;
+  box-shadow: 0 0 10px #836fff;
+}
+
+/* 🔵 FLOATING BUTTON */
+.floating-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  background: #6a4fcf;
+  color: white;
+  font-size: 28px;
+  border: none;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: 0.3s;
+  z-index: 999;
+}
+.floating-btn:hover {
+  background: #836fff;
+  box-shadow: 0 0 12px #a88eff;
+}
+
+/* 📦 MODAL STYLE */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+}
+.modal-content {
+  background: rgba(255, 255, 255, 0.08);
+  padding: 20px;
+  border-radius: 16px;
+  width: 400px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  text-align: center;
+}
+.close-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+}
+
+.add-btn-inline {
+  background: #6a4fcf;
+  color: white;
+  font-weight: 600;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-left: auto;
+}
+.add-btn-inline:hover {
+  background: #836fff;
+  box-shadow: 0 0 8px #a88eff;
+}
+
+</style>
+<body>
+<canvas id="particles"></canvas>
+  <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
+  
+  <div class="card filter-bar">
+    <label for="categoryFilter">Phân loại:</label>
+    <select id="categoryFilter">
+      <option value="">Tất cả</option>
+    </select>
+
+    <label for="searchInput">Tìm kiếm:</label>
+    <input type="text" id="searchInput" placeholder="Nhập từ khóa...">
+   <button id="openModalBtn" class="add-btn-inline">➕ Thêm</button>
+  </div>
+
+<div class="card">
+<button class="file-btn" onclick="exportData()">📤 Xuất JSON</button>
+<input type="file" id="importJsonInput" accept=".json">
+<button class="file-btn" onclick="importData()">📥 Nhập JSON</button>
+  </div>
+
+<!-- CARD CONTAINER -->
+<div id="cardContainer"></div>
+<!-- 📦 MODAL THÊM TÀI SẢN -->
+<div id="addAssetModal" class="modal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="closeAddModal()">&times;</span>
+    <h3>➕ Thêm Tài Sản Mới</h3>
+    <form id="addForm" autocomplete="off" class="form-grid">
+      <input type="text" id="newName" placeholder="📛 Tên" required>
+      <input type="text" id="newCategory" placeholder="📂 Phân loại" required>
+      <input type="date" id="newDate" required>
+      <input type="text" id="newStatus" placeholder="📌 Trạng thái" required>
+      <input type="text" id="newNote" placeholder="📝 Ghi chú">
+      <input type="url" id="newImage" placeholder="🖼 Link ảnh (https://...)">
+      <button type="submit" class="add-btn">➕ Thêm</button>
+    </form>
+  </div>
+</div>
+
+<!-- 📌 NOTE MODAL -->
+<div id="noteModal">
+  <div id="noteModalContent">
+    <h3>📝 Ghi chú cho <span id="noteItemName"></span></h3>
+    <textarea id="noteText"></textarea>
+    <button onclick="saveNote()">💾 Lưu ghi chú</button>
+    <button onclick="closeNoteModal()" style="margin-top:8px;background:#c94f4f;">❌ Đóng</button>
+  </div>
+</div>
+
+  <div id="imageOverlay" onclick="hideOverlay()">
+    <img src="" alt="full" />
+  </div>
+<script>
+
+let items = JSON.parse(localStorage.getItem("items") || "[]");
+const cardContainer = document.getElementById("cardContainer");
+const categoryFilter = document.getElementById("categoryFilter");
+const searchInput = document.getElementById("searchInput");
+const overlay = document.getElementById("imageOverlay");
+const overlayImg = overlay.querySelector("img");
+
+// 📦 MODAL JS
+const addAssetModal = document.getElementById("addAssetModal");
+const openModalBtn = document.getElementById("openModalBtn");
+
+openModalBtn.onclick = () => {
+  addAssetModal.style.display = "flex";
+};
+function closeAddModal() {
+  addAssetModal.style.display = "none";
+}
+
+// Đóng modal khi click nền tối
+window.onclick = (e) => {
+  if (e.target === addAssetModal) {
+    addAssetModal.style.display = "none";
+  }
+};
+
+function renderCards() {
+  cardContainer.innerHTML = "";
+  let filtered = items.filter(item => 
+    (!categoryFilter.value || item.category === categoryFilter.value) &&
+    (item.name.toLowerCase().includes(searchInput.value.toLowerCase()) || 
+    item.note.toLowerCase().includes(searchInput.value.toLowerCase()))
+  );
+
+  filtered.forEach((item, index) => {
+    const card = document.createElement("div");
+    card.className = "asset-card";
+    card.innerHTML = `
+      <button class="delete-btn" onclick="deleteItem(${index})">×</button>
+      <img src="${item.image || 'https://via.placeholder.com/200'}" onclick="showOverlay('${item.image}')">
+      <h4 contenteditable onblur="editItem(${index}, 'name', this.innerText)">${item.name}</h4>
+      <p><b>📂 Phân loại:</b> <span contenteditable onblur="editItem(${index}, 'category', this.innerText)">${item.category}</span></p>
+      <p><b>📌 Trạng thái:</b> <span contenteditable onblur="editItem(${index}, 'status', this.innerText)">${item.status}</span></p>
+      <p><button class="note-btn" onclick="openNoteModal(${index})">📝 Ghi chú</button></p>
+      <p><b>📅 Ngày mua:</b> <span contenteditable onblur="editItem(${index}, 'date', this.innerText)">${item.date}</span></p>
+    `;
+    cardContainer.appendChild(card);
+  });
+
+  updateCategoryFilter();
+  localStorage.setItem("items", JSON.stringify(items));
+}
+
+function updateCategoryFilter() {
+  let categories = [...new Set(items.map(item => item.category))];
+  categoryFilter.innerHTML = '<option value="">Tất cả</option>';
+  categories.forEach(cat => {
+    let opt = document.createElement("option");
+    opt.value = cat;
+    opt.textContent = cat;
+    categoryFilter.appendChild(opt);
+  });
+}
+
+document.getElementById("addForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  let newItem = {
+    name: newName.value,
+    category: newCategory.value,
+    date: newDate.value,
+    status: newStatus.value,
+    note: newNote.value,
+    image: newImage.value
+  };
+  items.push(newItem);
+  renderCards();
+  this.reset();
+});
+
+function editItem(index, field, value) {
+  items[index][field] = value;
+  localStorage.setItem("items", JSON.stringify(items));
+}
+
+function deleteItem(index) {
+  if (confirm("❌ Bạn có chắc muốn xóa tài sản này?")) {
+    items.splice(index, 1);
+    renderCards();
+  }
+}
+
+function exportData() {
+  let blob = new Blob([JSON.stringify(items, null, 2)], { type: "application/json" });
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "assets.json";
+  link.click();
+}
+
+function importData() {
+  const file = document.getElementById("importJsonInput").files[0];
+  if (!file) return alert("Vui lòng chọn file JSON!");
+  let reader = new FileReader();
+  reader.onload = e => {
+    items = JSON.parse(e.target.result);
+    renderCards();
+  };
+  reader.readAsText(file);
+}
+
+categoryFilter.addEventListener("change", renderCards);
+searchInput.addEventListener("input", renderCards);
+
+/* INIT */
+renderCards();
+
+function showOverlay(url) {
+  if (!overlayImg) return;
+  overlayImg.src = url;
+  overlay.style.display = 'flex';
+}
+
+if (typeof window !== 'undefined') window.showOverlay = showOverlay;
+
+function hideOverlay() {
+  if (!overlayImg) return;
+  overlay.style.display = 'none';
+  overlayImg.src = '';
+}
+
+if (typeof window !== 'undefined') window.hideOverlay = hideOverlay;
+if (typeof module !== "undefined") { module.exports = {}; }
+
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+for (let i = 0; i < 50; i++) {
+  particles.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: Math.random() * 2,
+    d: Math.random() + 0.2
+  });
+}
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+  particles.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI*2, true);
+    ctx.fill();
+  });
+  moveParticles();
+}
+
+function moveParticles() {
+  particles.forEach(p => {
+    p.y += p.d;
+    if (p.y > canvas.height) {
+      p.y = 0;
+      p.x = Math.random() * canvas.width;
+    }
+  });
+}
+
+setInterval(drawParticles, 40);
+
+// 📌 Quản lý modal ghi chú
+let currentNoteIndex = null;
+
+function openNoteModal(index) {
+  currentNoteIndex = index;
+  document.getElementById("noteItemName").innerText = items[index].name;
+  document.getElementById("noteText").value = items[index].note || "";
+  document.getElementById("noteModal").style.display = "flex";
+}
+
+function closeNoteModal() {
+  document.getElementById("noteModal").style.display = "none";
+}
+
+function saveNote() {
+  if (currentNoteIndex !== null) {
+    items[currentNoteIndex].note = document.getElementById("noteText").value;
+    localStorage.setItem("items", JSON.stringify(items));
+    alert("✅ Đã lưu ghi chú!");
+    closeNoteModal();
+    renderCards(); // refresh card để cập nhật
+  }
+}
+
+</script>
+</body>
+</html>
