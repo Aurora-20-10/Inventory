@@ -7,6 +7,16 @@
 </head>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* === DASHBOARD FIX === */
+.dashboard-container {
+  max-width: 800px;
+  margin: 0 auto;   /* căn giữa */
+}
+
+.dashboard-container canvas {
+  max-width: 100%;
+  max-height: 400px;  /* Giới hạn chiều cao */
+}
 /* ==== BASE UI ==== */
 body {
   margin: 0;
@@ -482,12 +492,107 @@ button:hover::before, .file-btn:hover::before, .action-btn:hover::before {
   background: #836fff;
   box-shadow: 0 0 8px #a88eff;
 }
+.view-toggle button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  margin: 5px;
+  border: none;
+  cursor: pointer;
+  background: #6a4fcf;
+  color: white;
+  font-weight: bold;
+}
+.gallery-item {
+  text-align: center;
+}
+.gallery-item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.chart-card {
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  text-align: center;
+  height: 380px;          /* ✅ Cố định chiều cao card */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.chart-card h3 {
+  margin-bottom: 15px;
+}
+
+.chart-card canvas {
+  width: 100% !important;
+  height: 260px !important;   /* ✅ Chiều cao vừa khung */
+}
+
+/* 📊 MODAL CHO BIỂU ĐỒ */
+#dashboardModal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Khung modal */
+#dashboardModal .modal-content {
+  background: rgba(255,255,255,0.08);
+  padding: 20px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 900px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  text-align: center;
+  color: #fff;
+  position: relative;
+}
+
+/* ❌ Nút đóng trắng cho modal biểu đồ */
+#dashboardModal .close-btn {
+  position: absolute;
+  right: 20px;
+  top: 10px;
+  font-size: 32px;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+#dashboardModal .close-btn:hover {
+  color: #ff8080;
+}
 
 </style>
 <body>
 <canvas id="particles"></canvas>
   <h2>🗃️ Quản Lý Tài Sản Cá Nhân</h2>
-  
+  <div class="view-toggle">
+  <button onclick="setView('card')">📇 Card</button>
+  <button onclick="setView('gallery')">🖼 Gallery</button>
+</div>
   <div class="card filter-bar">
     <label for="categoryFilter">Phân loại:</label>
     <select id="categoryFilter">
@@ -503,6 +608,7 @@ button:hover::before, .file-btn:hover::before, .action-btn:hover::before {
 <button class="file-btn" onclick="exportData()">📤 Xuất JSON</button>
 <input type="file" id="importJsonInput" accept=".json">
 <button class="file-btn" onclick="importData()">📥 Nhập JSON</button>
+<button class="file-btn" onclick="openDashboard()">📊 Xem Biểu Đồ</button>
   </div>
 
 <!-- CARD CONTAINER -->
@@ -517,6 +623,10 @@ button:hover::before, .file-btn:hover::before, .action-btn:hover::before {
       <input type="text" id="newCategory" placeholder="📂 Phân loại" required>
       <input type="date" id="newDate" required>
       <input type="text" id="newStatus" placeholder="📌 Trạng thái" required>
+      <input type="number" id="newPrice" placeholder="💵 Giá mua (VND)">
+      <input type="number" id="newValue" placeholder="📉 Giá trị hiện tại (VND)">
+      <input type="number" id="depreciation" placeholder="% Khấu hao/năm">
+      <input type="date" id="newWarranty" placeholder="Ngày hết bảo hành">
       <input type="text" id="newNote" placeholder="📝 Ghi chú">
       <input type="url" id="newImage" placeholder="🖼 Link ảnh (https://...)">
       <button type="submit" class="add-btn">➕ Thêm</button>
@@ -537,6 +647,28 @@ button:hover::before, .file-btn:hover::before, .action-btn:hover::before {
   <div id="imageOverlay" onclick="hideOverlay()">
     <img src="" alt="full" />
   </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js">
+</script>
+<!-- 📊 DASHBOARD ĐẸP -->
+<!-- 📊 DASHBOARD MODAL -->
+<div id="dashboardModal" class="modal">
+  <div class="modal-content" style="width: 90%; max-width: 900px;">
+    <span class="close-btn" onclick="closeDashboard()">&times;</span>
+    <h2>📊 Biểu đồ tài sản</h2>
+    <div class="dashboard-grid">
+      <div class="chart-card">
+        <h3>📂 Tỷ lệ tài sản theo loại</h3>
+        <canvas id="categoryChart"></canvas>
+      </div>
+      <div class="chart-card">
+        <h3>💰 Tổng giá trị theo loại</h3>
+        <canvas id="valueChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
 <script>
 
 let items = JSON.parse(localStorage.getItem("items") || "[]");
@@ -545,6 +677,12 @@ const categoryFilter = document.getElementById("categoryFilter");
 const searchInput = document.getElementById("searchInput");
 const overlay = document.getElementById("imageOverlay");
 const overlayImg = overlay.querySelector("img");
+let currentView = 'card';
+function setView(view) {
+  currentView = view;
+  renderCards();
+}
+window.setView = setView;
 
 // 📦 MODAL JS
 const addAssetModal = document.getElementById("addAssetModal");
@@ -572,7 +710,22 @@ function renderCards() {
     item.note.toLowerCase().includes(searchInput.value.toLowerCase()))
   );
 
-  filtered.forEach((item, index) => {
+ if (currentView === 'gallery') {
+    // Gallery View
+    filtered.forEach((item) => {
+      const imgDiv = document.createElement("div");
+      imgDiv.className = "gallery-item";
+      imgDiv.innerHTML = `
+        <img src="${item.image}" onclick="showOverlay('${item.image}')">
+        <p>${item.name}</p>
+      `;
+      cardContainer.appendChild(imgDiv);
+    });
+    return; // ✅ Kết thúc ở đây để không chạy tiếp Card View
+}  
+
+// ⬇️ PHẦN CARD VIEW NẰM Ở ĐÂY, KHÔNG ĐÓNG HÀM VỘI
+filtered.forEach((item, index) => {
     const card = document.createElement("div");
     card.className = "asset-card";
     card.innerHTML = `
@@ -581,24 +734,100 @@ function renderCards() {
       <h4 contenteditable onblur="editItem(${index}, 'name', this.innerText)">${item.name}</h4>
       <p><b>📂 Phân loại:</b> <span contenteditable onblur="editItem(${index}, 'category', this.innerText)">${item.category}</span></p>
       <p><b>📌 Trạng thái:</b> <span contenteditable onblur="editItem(${index}, 'status', this.innerText)">${item.status}</span></p>
+      <p>💵 Giá mua: ${(item.price ? item.price : 0).toLocaleString()}đ</p>
+      <p>📉 Giá trị hiện tại: ${(calculateDepreciation(item) ? calculateDepreciation(item) : 0).toLocaleString()}đ</p>
+      <p>🔁 Bảo hành: ${checkWarranty(item)}</p>
       <p><button class="note-btn" onclick="openNoteModal(${index})">📝 Ghi chú</button></p>
       <p><b>📅 Ngày mua:</b> <span contenteditable onblur="editItem(${index}, 'date', this.innerText)">${item.date}</span></p>
     `;
     cardContainer.appendChild(card);
-  });
-
-  updateCategoryFilter();
-  localStorage.setItem("items", JSON.stringify(items));
+ });
+ updateCategoryFilter(); 
 }
 
+function calculateDepreciation(item) {
+  // Nếu chưa có giá trị, trả về 0 để tránh lỗi undefined
+  if (!item.price && !item.value) return 0;
+
+  // Nếu có value mà chưa set depreciation, ưu tiên trả về value
+  if ((!item.depreciation || !item.date) && item.value) return item.value;
+
+  let years = (new Date() - new Date(item.date)) / (1000*60*60*24*365);
+  let depreciated = (item.price || 0) * Math.pow((1 - (item.depreciation || 0)/100), years);
+  return Math.max(depreciated, 0).toFixed(0);
+}
+
+function checkWarranty(item) {
+  if (!item.warrantyEnd) return "";
+  let daysLeft = (new Date(item.warrantyEnd) - new Date()) / (1000*60*60*24);
+  if (daysLeft < 0) return "❌ Hết bảo hành";
+  if (daysLeft <= 30) return "⚠️ Sắp hết bảo hành";
+  return "✅ Còn bảo hành";
+}
+
+function renderDashboard() {
+  let ctx1 = document.getElementById('categoryChart').getContext('2d');
+  let ctx2 = document.getElementById('valueChart').getContext('2d');
+  if (window.categoryChartInstance) window.categoryChartInstance.destroy();
+  if (window.valueChartInstance) window.valueChartInstance.destroy();
+
+  // Pie chart: số lượng tài sản theo loại
+  let categories = {};
+  items.forEach(i => { categories[i.category] = (categories[i.category] || 0) + 1; });
+
+window.categoryChartInstance = new Chart(ctx1, {
+    type: 'pie',
+    data: {
+        labels: Object.keys(categories),
+        datasets: [{
+            data: Object.values(categories),
+            backgroundColor: ['#6a4fcf','#4fc9b5','#ff8c42','#ff5f5f']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+    layout: { padding: 10 }
+  }
+});
+
+  // Bar chart: tổng giá trị tài sản theo loại
+  let values = {};
+  items.forEach(i => { values[i.category] = (values[i.category] || 0) + (i.value || i.price || 0); });
+
+ window.valueChartInstance = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: Object.keys(values),
+      datasets: [{
+        label: 'Tổng giá trị (VND)',
+        data: Object.values(values),
+        backgroundColor: '#836fff'
+      }]
+    }
+  });
+} 
 function updateCategoryFilter() {
+  // 🔄 Xoá sạch tất cả option cũ
+  categoryFilter.innerHTML = "";
+
+  // ✅ Thêm option “Tất cả” DUY NHẤT
+  let defaultOpt = document.createElement("option");
+  defaultOpt.value = "";
+  defaultOpt.textContent = "Tất cả";
+  categoryFilter.appendChild(defaultOpt);
+
+  // 📂 Lấy danh sách các category duy nhất từ items
   let categories = [...new Set(items.map(item => item.category))];
-  categoryFilter.innerHTML = '<option value="">Tất cả</option>';
+
+  // ➕ Thêm từng category vào dropdown
   categories.forEach(cat => {
-    let opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    categoryFilter.appendChild(opt);
+    if (cat && cat.trim() !== "") {   // bỏ qua giá trị rỗng
+      let opt = document.createElement("option");
+      opt.value = cat;
+      opt.textContent = cat;
+      categoryFilter.appendChild(opt);
+    }
   });
 }
 
@@ -610,22 +839,29 @@ document.getElementById("addForm").addEventListener("submit", function(e){
     date: newDate.value,
     status: newStatus.value,
     note: newNote.value,
-    image: newImage.value
+    image: newImage.value,
+price: parseFloat(newPrice.value) || 0,
+value: parseFloat(newValue.value) || parseFloat(newPrice.value) || 0,
+depreciation: parseFloat(depreciation.value) || 0,
+warrantyEnd: newWarranty.value
   };
   items.push(newItem);
   renderCards();
+  renderDashboard();
   this.reset();
 });
 
 function editItem(index, field, value) {
   items[index][field] = value;
   localStorage.setItem("items", JSON.stringify(items));
+  renderDashboard();
 }
 
 function deleteItem(index) {
   if (confirm("❌ Bạn có chắc muốn xóa tài sản này?")) {
     items.splice(index, 1);
     renderCards();
+    renderDashboard();
   }
 }
 
@@ -644,6 +880,7 @@ function importData() {
   reader.onload = e => {
     items = JSON.parse(e.target.result);
     renderCards();
+    renderDashboard();
   };
   reader.readAsText(file);
 }
@@ -718,6 +955,7 @@ function openNoteModal(index) {
   document.getElementById("noteText").value = items[index].note || "";
   document.getElementById("noteModal").style.display = "flex";
 }
+window.openNoteModal = openNoteModal;
 
 function closeNoteModal() {
   document.getElementById("noteModal").style.display = "none";
@@ -730,9 +968,18 @@ function saveNote() {
     alert("✅ Đã lưu ghi chú!");
     closeNoteModal();
     renderCards(); // refresh card để cập nhật
+    renderDashboard();
   }
+}
+ 
+function openDashboard() {
+  document.getElementById("dashboardModal").style.display = "flex";
+  renderDashboard(); // 🔄 vẽ biểu đồ mỗi lần mở modal
+}
+
+function closeDashboard() {
+  document.getElementById("dashboardModal").style.display = "none";
 }
 
 </script>
-</body>
 </html>
